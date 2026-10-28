@@ -29,8 +29,8 @@ const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const toast=t=>{const e=$('#toast');e.textContent=t;e.style.display='block';setTimeout(()=>e.style.display='none',3200)};
 const fail=t=>{m.innerHTML='<div class="card"><b>تعذر التشغيل</b><p dir="ltr" style="word-break:break-all;white-space:pre-wrap">'+esc(t)+'</p></div>'};
 addEventListener('error',e=>fail(e.message));addEventListener('unhandledrejection',e=>fail(String(e.reason&&e.reason.message||e.reason)));
-let CFG;try{({CFG}=await import('./js/config.js'))}catch(e){fail('js/config.js not found. ارفع مجلد js كاملاً إلى GitHub.\n'+e.message);throw e}
-if(!CFG.firebase.apiKey){m.innerHTML='<div class="card">أكمل ملف js/config.js بإعدادات Firebase أولاً، وخطوات ذلك في ملف README.</div>';throw 0}
+let CFG;try{({CFG}=await import('./config.js'))}catch(e){fail('config.js not found. ارفع مجلد js كاملاً إلى GitHub.\n'+e.message);throw e}
+if(!CFG.firebase.apiKey){m.innerHTML='<div class="card">أكمل ملف config.js بإعدادات Firebase أولاً، وخطوات ذلك في ملف README.</div>';throw 0}
 const V='https://www.gstatic.com/firebasejs/10.14.1/';
 let initializeApp,A,F;try{({initializeApp}=await import(V+'firebase-app.js'));A=await import(V+'firebase-auth.js');F=await import(V+'firebase-firestore.js')}catch(e){fail('Firebase library failed to load. تحقق من الاتصال.\n'+e.message);throw e}
 const app=initializeApp(CFG.firebase),auth=A.getAuth(app),db=F.getFirestore(app);

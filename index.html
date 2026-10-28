@@ -6,7 +6,7 @@
 <title>AGRESA | HSAM مستغانم</title>
 <meta name="description" content="AGRESA نادي علمي فلاحي في المدرسة العليا للعلوم الفلاحية مستغانم، تأسس عام 2017.">
 <meta name="theme-color" content="#0a3d22">
-<link rel="icon" href="assets/logo.png">
+<link rel="icon" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Fraunces:opsz,wght@9..144,600;9..144,800&display=swap" rel="stylesheet">
 <style>
@@ -67,7 +67,7 @@ footer .soc{justify-content:center;margin:14px 0}footer .soc a,footer .soc span{
 </head>
 <body>
 <header>
- <a class="brand" href="#/"><span class="badge"><img src="assets/logo.png" alt="AGRESA"></span>AGRESA</a>
+ <a class="brand" href="#/"><span class="badge"><img src="logo.png" alt="AGRESA"></span>AGRESA</a>
  <nav id="nav" aria-label="main"></nav>
  <div class="tools" id="tools"></div>
 </header>
@@ -149,7 +149,7 @@ function countdown(){
 }
 function home(){
  const tx=t(),e=nextEv(),yrs=new Date().getFullYear()-2017;
- return `<div class="hero"><div class="wrap"><div><div class="badge-big"><img src="assets/logo.png" alt="AGRESA"></div><h1>${tx.h}</h1><p>${tx.p}</p>
+ return `<div class="hero"><div class="wrap"><div><div class="badge-big"><img src="logo.png" alt="AGRESA"></div><h1>${tx.h}</h1><p>${tx.p}</p>
  <a class="btn" href="#/join">${tx.join}</a><a class="btn alt" href="#/story">${tx.story}</a></div><div class="photo">${tx.ph}</div></div></div>
  <section><div class="wrap"><div class="ev"><h2>${tx.next}</h2>${e?`<p>${esc(tt(e))}${e.demo?` <span class="tag">${tx.demo}</span>`:''}</p><p class="sub" style="margin:4px auto">${when(e)} · ${esc(pl(e))}</p>`:''}<div id="cd"></div>
  ${e?`<a class="btn" href="#/events">${tx.reg}</a><a class="btn alt" href="#/events">${tx.cal}</a>`:''}</div></div></section>
@@ -182,7 +182,7 @@ function galPage(){return SITE.gallery.length?`<div class="grid">${SITE.gallery.
 function icsDl(id){const e=SITE.events.find(x=>x.id===id);if(!e)return;const c=x=>String(x).replace(/[,;\n]/g,' ');
  const b=new Blob([['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//AGRESA//AR','BEGIN:VEVENT','UID:'+e.id+'@agresa','DTSTAMP:'+fz(Date.now()),'DTSTART:'+fz(e.start),'DTEND:'+fz(e.end),'SUMMARY:'+c(e.title.ar||tt(e)),'LOCATION:'+c(pl(e)),'END:VEVENT','END:VCALENDAR'].join('\r\n')],{type:'text/calendar'});
  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='agresa-event.ics';a.click()}
-async function load(){try{const {CFG}=await import('./js/config.js');if(!CFG.firebase.apiKey)return;
+async function load(){try{const {CFG}=await import('./config.js');if(!CFG.firebase.apiKey)return;
  const V='https://www.gstatic.com/firebasejs/10.14.1/',[{initializeApp},F]=await Promise.all([import(V+'firebase-app.js'),import(V+'firebase-firestore.js')]),db=F.getFirestore(initializeApp(CFG.firebase));window.FB={db,F};
  const g=async(n,f)=>(await F.getDocs(F.query(F.collection(db,n),F.where(f,'==',true)))).docs.map(d=>({id:d.id,...d.data()}));
  const [ev,po,fb]=await Promise.all([g('events','pub'),g('posts','pub'),g('feedback','ok')]);
@@ -206,7 +206,7 @@ const PRES=[
  {n:'Cherif Ali',r:['الرئيس الرابع','Fourth president','Quatrième président'],y:'2025',i:'p4'},
  {n:'Kamel Soltani',r:['الرئيس الخامس (الحالي)','Fifth and current president','Cinquième président (actuel)'],y:'2025 – ⟶',i:'p5'}];
 function presPage(){const k={ar:0,en:1,fr:2}[lang],now={ar:'الآن',en:'present',fr:'aujourd’hui'}[lang];
- return `<div class="grid">${PRES.map(p=>`<div class="card"><img src="assets/${p.i}.webp" alt="${esc(p.n||p.r[k])}" loading="lazy" style="width:100%;aspect-ratio:4/5;object-fit:cover;object-position:top;border-radius:12px;margin-bottom:10px"><span class="tag">${p.y.replace('⟶',now)}</span><h3>${esc(p.n||p.r[k])}</h3>${p.n?`<p class="sub" style="margin:0">${p.r[k]}</p>`:''}</div>`).join('')}</div>`}
+ return `<div class="grid">${PRES.map(p=>`<div class="card"><img src="${p.i}.webp" alt="${esc(p.n||p.r[k])}" loading="lazy" style="width:100%;aspect-ratio:4/5;object-fit:cover;object-position:top;border-radius:12px;margin-bottom:10px"><span class="tag">${p.y.replace('⟶',now)}</span><h3>${esc(p.n||p.r[k])}</h3>${p.n?`<p class="sub" style="margin:0">${p.r[k]}</p>`:''}</div>`).join('')}</div>`}
 function render(){
  const k=location.hash.replace('#/','');
  $('#app').innerHTML=k===''?home():(ROUTES.includes(k)?page(k):home());
