@@ -40,10 +40,11 @@ const put=(c,o)=>{const {id,...r}=o;return F.setDoc(F.doc(db,c,id),r)},rm=(c,id)
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 const iso=v=>v?v+':00+01:00':'',loc=s=>s?s.slice(0,16):'';
 const get=(o,k)=>k.split('.').reduce((a,b)=>a?.[b],o),set=(o,k,v)=>{const p=k.split('.');let c=o;p.slice(0,-1).forEach(x=>c=c[x]??={});c[p.at(-1)]=v};
-async function up(f){if(!f.type.startsWith('image/'))throw Error('ملف غير مسموح');if(!CFG.cloud.name)throw Error('أكمل إعدادات Cloudinary في config.js');
- const b=await createImageBitmap(f),s=Math.min(1,1600/Math.max(b.width,b.height)),c=document.createElement('canvas');c.width=b.width*s|0;c.height=b.height*s|0;c.getContext('2d').drawImage(b,0,0,c.width,c.height);
- const w=await new Promise(r=>c.toBlob(r,'image/webp',.82)),fd=new FormData();fd.append('file',w);fd.append('upload_preset',CFG.cloud.preset);
- const r=await fetch(`https://api.cloudinary.com/v1_1/${CFG.cloud.name}/image/upload`,{method:'POST',body:fd});if(!r.ok)throw Error('فشل الرفع');return(await r.json()).secure_url}
+async function up(f){if(f.type&&!f.type.startsWith('image/'))throw Error('ملف غير مسموح');if(!CFG.cloud.name)throw Error('أكمل إعدادات Cloudinary في config.js');
+  const dec=async f=>{try{return await createImageBitmap(f)}catch(e){const i=new Image();i.src=URL.createObjectURL(f);await i.decode();return i}};
+ let w=f;try{const b=await dec(f),W=b.width||b.naturalWidth,H=b.height||b.naturalHeight,s=Math.min(1,1600/Math.max(W,H)),c=document.createElement('canvas');c.width=W*s|0;c.height=H*s|0;c.getContext('2d').drawImage(b,0,0,c.width,c.height);w=await new Promise(r=>c.toBlob(r,'image/webp',.82))||f}catch(e){if(f.size>10e6)throw Error('الصورة كبيرة وغير مدعومة. حوّلها إلى JPG أو التقط لقطة شاشة لها')}
+ const fd=new FormData();fd.append('file',w);fd.append('upload_preset',CFG.cloud.preset);
+ const r=await fetch(`https://api.cloudinary.com/v1_1/${CFG.cloud.name}/image/upload`,{method:'POST',body:fd});if(!r.ok){const j=await r.json().catch(()=>({}));throw Error('Cloudinary: '+(j.error?.message||r.status))}return(await r.json()).secure_url}
 
 const L3=(k,l,t)=>[['.ar',' بالعربية'],['.en',' بالإنجليزية'],['.fr',' بالفرنسية']].map(([s,n])=>[k+s,l+n,t,s==='.ar'?'':'ltr']);
 const S={
