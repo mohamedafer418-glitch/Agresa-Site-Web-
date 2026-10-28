@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AGRESA | HSAM مستغانم</title>
+<meta name="description" content="AGRESA نادي علمي فلاحي في المدرسة العليا للعلوم الفلاحية مستغانم، تأسس عام 2017.">
+<meta name="theme-color" content="#0a3d22">
+<link rel="icon" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Fraunces:opsz,wght@9..144,600;9..144,800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f0dd;--bg2:#e9e5c9;--ink:#06210f;--mute:#3d5a47;--g1:#0a3d22;--g2:#1fb05a;--mint:#7be3a1;--gold:#e6c36a;--card:#fffdf0;--line:#0a3d2233}
+:root[data-t=dark]{--bg:#06210f;--bg2:#0a3d22;--ink:#f3f0dd;--mute:#a9c9b3;--card:#0b2f1a;--line:#7be3a144}
+*{box-sizing:border-box;margin:0}html{scroll-padding-top:70px}
+body{font:400 17px/1.8 Cairo,sans-serif;background:var(--bg);color:var(--ink)}
+h1,h2,h3{line-height:1.25;font-weight:800}
+.lat{font-family:Fraunces,serif}
+a{color:inherit}:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+header{position:sticky;top:0;z-index:5;background:var(--g1);color:#f3f0dd;display:flex;align-items:center;gap:10px;padding:8px 14px;flex-wrap:wrap}
+.badge{width:46px;height:46px;border-radius:50%;background:#f3f0dd;display:grid;place-items:center;flex:none}
+.badge img{width:38px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font:800 20px Fraunces,serif;letter-spacing:.04em}
+nav{display:flex;gap:2px;overflow-x:auto;flex:1;scrollbar-width:none}
+nav a{padding:8px 12px;border-radius:99px;text-decoration:none;white-space:nowrap;font-size:15px}
+nav a.on,nav a:hover{background:#7be3a122;color:var(--mint)}
+.tools{display:flex;gap:6px}
+.tools button{min-width:44px;height:44px;border-radius:12px;border:1px solid #7be3a155;background:transparent;color:inherit;font:600 14px Cairo;cursor:pointer}
+.tools button.on{background:var(--gold);color:var(--ink);border-color:var(--gold)}
+main{min-height:70vh}
+.wrap{max-width:1040px;margin:auto;padding:0 18px}
+.hero{background:linear-gradient(160deg,#06210f,#0a3d22 70%);color:#f3f0dd;padding:56px 0 64px;position:relative;overflow:hidden}
+.hero .wrap{display:grid;gap:28px;align-items:center}
+@media(min-width:800px){.hero .wrap{grid-template-columns:1.1fr .9fr}}
+.hero h1{font-size:clamp(34px,7vw,64px)}
+.hero p{color:#cfe7d7;max-width:34em;margin-top:12px}
+.photo{aspect-ratio:4/3;border-radius:22px;border:2px dashed var(--gold);display:grid;place-items:center;text-align:center;padding:16px;color:var(--gold);background:#ffffff0d;font-size:15px}
+.btn{display:inline-block;margin-top:18px;padding:12px 24px;border-radius:99px;background:var(--gold);color:#06210f;font-weight:800;text-decoration:none;border:0;cursor:pointer;font-family:inherit;font-size:16px}
+.btn.alt{background:transparent;color:inherit;border:1.5px solid currentColor;margin-inline-start:8px}
+section{padding:46px 0}
+section h2{font-size:clamp(26px,4vw,36px);margin-bottom:8px}
+.sub{color:var(--mute);margin-bottom:22px;max-width:40em}
+.count{display:flex;gap:10px;margin:18px 0;direction:ltr;justify-content:center}
+.count div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 6px;min-width:72px;text-align:center}
+.count b{display:block;font:800 34px Fraunces,serif;color:var(--g2)}
+.count small{color:var(--mute);font-size:13px}
+.ev{background:var(--bg2);border-radius:26px;padding:28px 20px;text-align:center}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}
+.card h3{font-size:19px;margin-bottom:4px}
+.tag{display:inline-block;font-size:12px;padding:1px 10px;border-radius:99px;background:var(--gold);color:#06210f;font-weight:600;margin-bottom:8px}
+.empty{border:2px dashed var(--line);border-radius:18px;padding:26px;text-align:center;color:var(--mute)}
+.tl{border-inline-start:3px solid var(--g2);padding-inline-start:18px;display:grid;gap:22px}
+.tl b{font:800 26px Fraunces,serif;color:var(--g2)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center}
+.stats b{display:block;font:800 clamp(30px,6vw,48px) Fraunces,serif;color:var(--g2)}
+form{display:grid;gap:12px;max-width:520px}
+input,textarea,select{font:inherit;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);min-height:48px;width:100%}
+.soc{display:flex;gap:10px;flex-wrap:wrap}
+.soc a,.soc span{padding:10px 18px;border-radius:99px;border:1.5px solid var(--line);text-decoration:none;font-weight:600}
+.soc .off{opacity:.5}
+footer{background:var(--g1);color:#cfe7d7;padding:34px 0;text-align:center;font-size:15px}
+footer .soc{justify-content:center;margin:14px 0}footer .soc a,footer .soc span{border-color:#7be3a155}
+@media(prefers-reduced-motion:no-preference){.hero .badge-big{animation:rise 1.2s ease both}@keyframes rise{from{opacity:0;transform:translateY(18px)}}}
+.badge-big{width:150px;height:150px;border-radius:50%;background:#f3f0dd;display:grid;place-items:center;margin-bottom:18px}.badge-big img{width:124px}
+</style>
+</head>
+<body>
+<header>
+ <a class="brand" href="#/"><span class="badge"><img src="assets/logo.png" alt="AGRESA"></span>AGRESA</a>
+ <nav id="nav" aria-label="main"></nav>
+ <div class="tools" id="tools"></div>
+</header>
+<main id="app" tabindex="-1"></main>
+<footer><div class="wrap"><b class="lat">AGRESA</b><div id="fname"></div><div class="soc" id="fsoc"></div><small id="fnote"></small></div></footer>
+
+<script>
+/* ====== بيانات الموقع: في المرحلة 3 تُستبدل بقراءة من Firestore، والباقي يبقى كما هو ====== */
+const SITE={
+ tz:'Africa/Algiers',
+ social:{instagram:'https://www.instagram.com/agresaclub',tiktok:'https://www.tiktok.com/@agr__esa',facebook:'https://www.facebook.com/share/1C1BgzDSf8/'},
+ nextEvent:{demo:true,start:'2026-11-15T09:00:00+01:00',end:'2026-11-15T14:00:00+01:00',
+  title:{ar:'فعالية تجريبية: سيحدد المدير الموعد الحقيقي',en:'Demo event: the admin will set the real date',fr:'Événement démo : l’admin fixera la vraie date'},
+  place:{ar:'HSAM مستغانم',en:'HSAM Mostaganem',fr:'HSAM Mostaganem'}},
+ news:[],fb:[],events:[],founders:[],members:[],works:[],gallery:[],honor:[]
+};
+const T={
+ ar:{nav:['الرئيسية','قصتنا','الفعاليات','المؤسسون','الأعضاء','الأعمال','المعرض','الأخبار','انضم','تواصل','قاعة الشرف'],
+  school:'المدرسة العليا للعلوم الفلاحية مستغانم · HSAM',
+  h:'جذورنا في الأرض، وعلمنا يمتد',p:'نادٍ علمي فلاحي تأسس عام 2017، سكن قليلاً ثم عاد في يوم الاستقبال 2026 بجيل جديد يحمل الشعلة.',
+  ph:'مكان صورة الغلاف الحقيقية: ترفعها من لوحة الإدارة',join:'انضم إلينا',story:'اقرأ قصتنا',
+  next:'الفعالية القادمة',days:'يوم',hrs:'ساعة',min:'دقيقة',sec:'ثانية',demo:'تجريبي',reg:'سجّل الآن',cal:'أضف إلى التقويم',
+  noev:'لا فعالية قريبة الآن. ترقبوا الإعلان القادم.',news:'آخر الأخبار',nonews:'لا منشورات بعد. أول منشور تضيفه من لوحة الإدارة يظهر هنا.',
+  stats:['سنة منذ التأسيس','فعاليات','أعضاء'],
+  empty:'سيظهر المحتوى هنا بعد أن تضيفه من لوحة الإدارة.',
+  pages:{story:['قصتنا','حكاية شباب حملوا الطموح وزرعوه في أرض المدرسة.'],events:['الفعاليات','القادمة والسابقة.'],founders:['المؤسسون والقدامى','بطاقات الذين بنوا النادي.'],members:['الأعضاء والهيئة الإدارية','جيل اليوم.'],works:['الأعمال والمشاريع','ورشات ومسابقات وخرجات وبحوث.'],gallery:['المعرض','ألبومات حسب السنة والفعالية.'],news:['الأخبار والإعلانات','كل ما يستجد في النادي.'],honor:['قاعة شرف يوم الاستقبال 2026','ترتيب الفرق الخمسة.']},
+  tl:[['2017','طموح وبضع أفكار','لم يكن معهم إلا الطموح. شباب من طلبة الفلاحة قرروا أن يكون للعلم بيت في مدرستهم، فبنوه بأيديهم وبحماس لا يهدأ.'],['جيل بعد جيل','الشعلة تنتقل','كل رئيس وكل فريق أضاف حلقة جديدة: ورشات وأفكار وضحكات وليالٍ طويلة من العمل. وما بدأ صغيراً كبر كما تكبر البذرة.'],['اليوم وغداً','والحكاية مستمرة','الجذور تعمّقت، والأغصان تمتد، والأوراق الجديدة تفتح كل يوم. كل طالب يدخل أڨريسا يكتب سطراً جديداً في القصة.']],
+  jt:'انضم إلى أڨريسا',jn:'الاسم الكامل',je:'البريد الإلكتروني',jm:'لماذا تريد الانضمام؟',jb:'إرسال الطلب',jnote:'النموذج الكامل متعدد الخطوات يُربط بصندوق الإدارة في المرحلة 3.',
+  ct:'تواصل معنا',soon:'يُضاف الرابط من لوحة الإدارة',foot:'نادٍ طلابي علمي فلاحي · تأسس 2017'},
+ en:{nav:['Home','Our story','Events','Founders','Members','Projects','Gallery','News','Join','Contact','Hall of fame'],
+  school:'Higher School of Agricultural Sciences Mostaganem · HSAM',
+  h:'Rooted in the soil, reaching for science',p:'A science and agriculture club founded in 2017. It rested for a while, then returned on Welcome Day 2026 with a new generation carrying the torch.',
+  ph:'Real cover photo goes here: upload it from the admin panel',join:'Join us',story:'Read our story',
+  next:'Next event',days:'days',hrs:'hours',min:'min',sec:'sec',demo:'demo',reg:'Register now',cal:'Add to calendar',
+  noev:'No upcoming event right now. Stay tuned.',news:'Latest news',nonews:'No posts yet. The first post you add in the admin panel appears here.',
+  stats:['years since founding','events','members'],
+  empty:'Content will appear here once you add it from the admin panel.',
+  pages:{story:['Our story','A tale of young people who planted their ambition in the school’s soil.'],events:['Events','Upcoming and past.'],founders:['Founders & alumni','The people who built the club.'],members:['Members & board','Today’s generation.'],works:['Projects','Workshops, contests, field trips, research.'],gallery:['Gallery','Albums by year and event.'],news:['News & announcements','What’s new in the club.'],honor:['Welcome Day 2026 hall of fame','Ranking of the five teams.']},
+  tl:[['2017','Ambition and a few ideas','They had nothing but ambition. A group of agriculture students decided science deserved a home on campus, and built it with their own hands and tireless energy.'],['Generation after generation','The torch passes on','Each president and each team added a new link: workshops, ideas, laughter and long nights of work. What started small grew the way a seed does.'],['Today and tomorrow','The story goes on','The roots run deeper, the branches reach further, and new leaves open every day. Every student who joins AGRESA writes a new line in the story.']],
+  jt:'Join AGRESA',jn:'Full name',je:'Email',jm:'Why do you want to join?',jb:'Send request',jnote:'The full multi-step form connects to the admin inbox in phase 3.',
+  ct:'Contact us',soon:'Link is added from the admin panel',foot:'Student science & agriculture club · Est. 2017'},
+ fr:{nav:['Accueil','Notre histoire','Événements','Fondateurs','Membres','Projets','Galerie','Actualités','Rejoindre','Contact','Palmarès'],
+  school:'École supérieure des sciences agronomiques de Mostaganem · HSAM',
+  h:'Enraciné dans la terre, tourné vers la science',p:'Un club scientifique et agricole fondé en 2017. Il s’est mis en pause, puis est revenu à la journée d’accueil 2026 avec une nouvelle génération.',
+  ph:'La vraie photo de couverture s’ajoute depuis l’espace admin',join:'Nous rejoindre',story:'Lire notre histoire',
+  next:'Prochain événement',days:'jours',hrs:'heures',min:'min',sec:'sec',demo:'démo',reg:'S’inscrire',cal:'Ajouter au calendrier',
+  noev:'Aucun événement proche. À suivre.',news:'Dernières actualités',nonews:'Aucune publication. La première ajoutée depuis l’admin apparaîtra ici.',
+  stats:['ans depuis la fondation','événements','membres'],
+  empty:'Le contenu apparaîtra ici après son ajout depuis l’espace admin.',
+  pages:{story:['Notre histoire','Des jeunes qui ont planté leur ambition dans la terre de l’école.'],events:['Événements','À venir et passés.'],founders:['Fondateurs et anciens','Ceux qui ont bâti le club.'],members:['Membres et bureau','La génération d’aujourd’hui.'],works:['Projets','Ateliers, concours, sorties, recherches.'],gallery:['Galerie','Albums par année et événement.'],news:['Actualités et annonces','Les nouveautés du club.'],honor:['Palmarès journée d’accueil 2026','Classement des cinq équipes.']},
+  tl:[['2017','De l’ambition et quelques idées','Ils n’avaient que de l’ambition. Des étudiants en agronomie ont décidé que la science méritait une maison dans leur école, et l’ont bâtie de leurs mains, avec une énergie inépuisable.'],['Génération après génération','Le flambeau passe','Chaque président et chaque équipe ont ajouté un maillon : ateliers, idées, rires et longues soirées de travail. Ce qui était petit a grandi comme une graine.'],['Aujourd’hui et demain','L’histoire continue','Les racines s’enfoncent, les branches s’étendent et de nouvelles feuilles s’ouvrent chaque jour. Chaque étudiant qui rejoint AGRESA écrit une ligne de plus.']],
+  jt:'Rejoindre AGRESA',jn:'Nom complet',je:'E-mail',jm:'Pourquoi nous rejoindre ?',jb:'Envoyer',jnote:'Le formulaire complet en étapes sera relié à l’admin en phase 3.',
+  ct:'Contact',soon:'Lien ajouté depuis l’espace admin',foot:'Club étudiant scientifique et agricole · Depuis 2017'}
+};
+const ROUTES=['','story','events','founders','members','works','gallery','news','join','contact','honor'];
+const NAMES={instagram:'Instagram',tiktok:'TikTok',facebook:'Facebook'};
+let lang=localStorage.lang||'ar',theme=localStorage.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'),timer;
+const $=s=>document.querySelector(s),t=()=>T[lang];
+
+function soc(){const tx=t();return Object.keys(NAMES).map(k=>SITE.social[k]?`<a href="${SITE.social[k]}" target="_blank" rel="noopener">${NAMES[k]}</a>`:`<span class="off" title="${tx.soon}">${NAMES[k]}</span>`).join('')}
+function fmt(d,o){return new Intl.DateTimeFormat({ar:'ar-DZ-u-nu-latn',en:'en-GB',fr:'fr-DZ'}[lang],{timeZone:SITE.tz,...o}).format(new Date(d))}
+function when(e){if(e.allDay)return fmt(e.start,{weekday:'long',day:'numeric',month:'long'});return fmt(e.start,{weekday:'long',day:'numeric',month:'long'})+' · '+fmt(e.start,{hour:'numeric',minute:'2-digit'})+' – '+fmt(e.end,{hour:'numeric',minute:'2-digit'})}
+
+function chrome(){
+ const h=location.hash.replace('#/','');
+ $('#nav').innerHTML=ROUTES.map((r,i)=>`<a href="#/${r}" class="${h===r?'on':''}">${t().nav[i]}</a>`).join('');
+ $('#tools').innerHTML=['ar','en','fr'].map(l=>`<button class="${l===lang?'on':''}" data-l="${l}" aria-label="${l}">${l==='ar'?'ع':l.toUpperCase()}</button>`).join('')+`<button id="th" aria-label="theme">${theme==='dark'?'☀':'☾'}</button>`;
+ $('#fname').textContent=t().school;$('#fsoc').innerHTML=soc();$('#fnote').textContent=t().foot;
+ document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr';document.documentElement.dataset.t=theme;
+}
+function countdown(){
+ const e=nextEv(),box=$('#cd');if(!box)return;clearInterval(timer);
+ if(!e){box.innerHTML=`<p>${t().noev}</p>`;return}
+ const tick=()=>{let s=Math.max(0,(new Date(e.start)-Date.now())/1000|0);
+  if(s===0&&new Date(e.end)<Date.now()){box.innerHTML=`<p>${t().noev}</p>`;clearInterval(timer);return}
+  const v=[s/86400|0,s%86400/3600|0,s%3600/60|0,s%60],L=[t().days,t().hrs,t().min,t().sec];
+  box.innerHTML=`<div class="count">${v.map((n,i)=>`<div><b>${String(n).padStart(2,'0')}</b><small>${L[i]}</small></div>`).join('')}</div>`};
+ tick();timer=setInterval(tick,1000);
+}
+function home(){
+ const tx=t(),e=nextEv(),yrs=new Date().getFullYear()-2017;
+ return `<div class="hero"><div class="wrap"><div><div class="badge-big"><img src="assets/logo.png" alt="AGRESA"></div><h1>${tx.h}</h1><p>${tx.p}</p>
+ <a class="btn" href="#/join">${tx.join}</a><a class="btn alt" href="#/story">${tx.story}</a></div><div class="photo">${tx.ph}</div></div></div>
+ <section><div class="wrap"><div class="ev"><h2>${tx.next}</h2>${e?`<p>${esc(tt(e))}${e.demo?` <span class="tag">${tx.demo}</span>`:''}</p><p class="sub" style="margin:4px auto">${when(e)} · ${esc(pl(e))}</p>`:''}<div id="cd"></div>
+ ${e?`<a class="btn" href="#/events">${tx.reg}</a><a class="btn alt" href="#/events">${tx.cal}</a>`:''}</div></div></section>
+ <section><div class="wrap"><h2>${tx.news}</h2>${newsList()}</div></section>
+ <section><div class="wrap stats"><div><b>${yrs}</b>${tx.stats[0]}</div><div><b>${SITE.events.length}</b>${tx.stats[1]}</div><div><b>${SITE.members.length}</b>${tx.stats[2]}</div></div></section>`;
+}
+function list(a,msg){return a.length?`<div class="grid">${a.map(x=>`<div class="card"><h3>${x.title?.[lang]||''}</h3></div>`).join('')}</div>`:`<div class="empty">${msg||t().empty}</div>`}
+function page(k){
+ const tx=t(),[ti,su]=tx.pages[k];let body;
+ if(k==='story')body=`<div class="tl">${tx.tl.map(r=>`<div><b>${r[0]}</b><h3>${r[1]}</h3><p>${r[2]}</p></div>`).join('')}</div>`;
+ else if(k==='join')body=`<h2>${tx.jt}</h2>${msgForm('joins')}`;
+ else if(k==='contact')body=`<div class="soc">${soc()}</div><p class="sub" style="margin-top:14px">${tx.school}</p>${msgForm('messages')}${fbForm()}${fbList()}`;
+ else if(k==='founders')body=presPage();else if(k==='news')body=newsList();else if(k==='events')body=evPage();else if(k==='gallery')body=galPage();else body=list(SITE[k]||[]);
+ const head=k==='join'?'':`<h2>${k==='contact'?tx.ct:ti}</h2><p class="sub">${k==='contact'?'':su}</p>`;
+ return `<section><div class="wrap">${head}${body}</div></section>`;
+}
+
+const ST={ar:{upcoming:'قادمة',live:'جارية الآن',ended:'منتهية',postponed:'مؤجلة',cancelled:'ملغاة'},en:{upcoming:'Upcoming',live:'Live now',ended:'Ended',postponed:'Postponed',cancelled:'Cancelled'},fr:{upcoming:'À venir',live:'En cours',ended:'Terminé',postponed:'Reporté',cancelled:'Annulé'}};
+const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const vis=e=>!e.publishAt||new Date(e.publishAt)<=Date.now();
+function st(e){if(e.status==='cancelled'||e.status==='postponed')return e.status;const n=Date.now();return n<new Date(e.start)?'upcoming':n<=new Date(e.end)?'live':'ended'}
+function nextEv(){const l=SITE.events.filter(e=>vis(e)&&['upcoming','live'].includes(st(e))).sort((a,b)=>new Date(a.start)-new Date(b.start));return l[0]||(SITE.events.length?null:SITE.nextEvent)}
+const tt=e=>e.title[lang]||e.title.ar||'',pl=e=>typeof e.place==='string'?e.place:(e.place?.[lang]||'');
+const fz=d=>new Date(d).toISOString().replace(/[-:]|\.\d+/g,'');
+function evCard(e){const s=st(e),tx=t(),on=s==='upcoming'||s==='live';
+ return `<div class="card">${e.poster?`<img src="${esc(e.poster)}" alt="${esc(tt(e))}" loading="lazy" style="width:100%;border-radius:12px;margin-bottom:10px">`:''}<span class="tag">${ST[lang][s]}</span><h3>${esc(tt(e))}</h3><p class="sub" style="margin:0">${when(e)}</p><p>${esc(pl(e))}${e.map?` <a href="${esc(e.map)}" target="_blank" rel="noopener">🗺</a>`:''}</p>${e.note?`<p><b>${esc(e.note)}</b></p>`:''}${e.desc?`<p>${esc(e.desc).replace(/\n/g,'<br>')}</p>`:''}${e.seats?`<p class="sub">${esc(e.seats)} ✦</p>`:''}${on&&e.reg?`<a class="btn" href="${esc(e.reg)}" target="_blank" rel="noopener">${tx.reg}</a> `:''}${s==='upcoming'?`<button class="btn alt" data-ics="${esc(e.id)}">${tx.cal} .ics</button> <a class="btn alt" target="_blank" rel="noopener" href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(tt(e))}&dates=${fz(e.start)}/${fz(e.end)}&location=${encodeURIComponent(pl(e))}">Google</a>`:''}${(e.album||[]).length?`<div class="grid" style="margin-top:10px">${e.album.map(a=>`<img src="${esc(a)}" alt="" loading="lazy" style="width:100%;border-radius:10px">`).join('')}</div>`:''}</div>`}
+function evPage(){const l=SITE.events.filter(vis),up=l.filter(e=>st(e)!=='ended').sort((a,b)=>new Date(a.start)-new Date(b.start)),old=l.filter(e=>st(e)==='ended').sort((a,b)=>new Date(b.start)-new Date(a.start));
+ return l.length?`<div class="grid">${up.concat(old).map(evCard).join('')}</div>`:`<div class="empty">${t().empty}</div>`}
+function galPage(){return SITE.gallery.length?`<div class="grid">${SITE.gallery.map(g=>`<figure class="card" style="padding:8px"><a href="${esc(g.img)}" target="_blank"><img src="${esc(g.img)}" alt="${esc(g.cap||'')}" loading="lazy" style="width:100%;border-radius:10px"></a>${g.cap?`<figcaption class="sub" style="margin:6px 0 0">${esc(g.cap)}</figcaption>`:''}</figure>`).join('')}</div>`:`<div class="empty">${t().empty}</div>`}
+function icsDl(id){const e=SITE.events.find(x=>x.id===id);if(!e)return;const c=x=>String(x).replace(/[,;\n]/g,' ');
+ const b=new Blob([['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//AGRESA//AR','BEGIN:VEVENT','UID:'+e.id+'@agresa','DTSTAMP:'+fz(Date.now()),'DTSTART:'+fz(e.start),'DTEND:'+fz(e.end),'SUMMARY:'+c(e.title.ar||tt(e)),'LOCATION:'+c(pl(e)),'END:VEVENT','END:VCALENDAR'].join('\r\n')],{type:'text/calendar'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='agresa-event.ics';a.click()}
+async function load(){try{const {CFG}=await import('./js/config.js');if(!CFG.firebase.apiKey)return;
+ const V='https://www.gstatic.com/firebasejs/10.14.1/',[{initializeApp},F]=await Promise.all([import(V+'firebase-app.js'),import(V+'firebase-firestore.js')]),db=F.getFirestore(initializeApp(CFG.firebase));window.FB={db,F};
+ const g=async(n,f)=>(await F.getDocs(F.query(F.collection(db,n),F.where(f,'==',true)))).docs.map(d=>({id:d.id,...d.data()}));
+ const [ev,po,fb]=await Promise.all([g('events','pub'),g('posts','pub'),g('feedback','ok')]);
+ SITE.events=ev;SITE.news=po.filter(vis).sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(b.created||0)-(a.created||0));SITE.fb=fb}catch(e){console.warn(e)}}
+const SENT={ar:'وصلتنا رسالتك، شكراً لك',en:'Received, thank you',fr:'Bien reçu, merci'};
+async function sendForm(ev,c){ev.preventDefault();const f=ev.target,d=Object.fromEntries(new FormData(f));if(d.hp)return;delete d.hp;
+ if(!window.FB){alert('Not connected yet');return}
+ if(d.rate)d.rate=+d.rate;
+ try{await FB.F.addDoc(FB.F.collection(FB.db,c),{...d,read:false,at:FB.F.serverTimestamp(),...(c==='feedback'?{ok:false}:{})});f.reset();f.insertAdjacentHTML('beforeend',`<p class="tag">${SENT[lang]}</p>`)}catch(e){alert('Error')}}
+function newsCard(x){return `<div class="card">${x.img?`<img src="${esc(x.img)}" alt="" loading="lazy" style="width:100%;border-radius:12px;margin-bottom:10px">`:''}${x.pinned?`<span class="tag">📌</span> `:''}<h3>${esc(x.title?.[lang]||x.title?.ar)}</h3><p>${esc(x.body?.[lang]||x.body?.ar).replace(/\n/g,'<br>')}</p></div>`}
+const newsList=()=>SITE.news.length?`<div class="grid">${SITE.news.map(newsCard).join('')}</div>`:`<div class="empty">${t().nonews}</div>`;
+const fbList=()=>(SITE.fb||[]).length?`<div class="grid" style="margin-top:18px">${SITE.fb.map(x=>`<div class="card"><b>${esc(x.name)}</b> <span class="tag">${'★'.repeat(x.rate||5)}</span><p>${esc(x.msg)}</p></div>`).join('')}</div>`:'';
+const FM={ar:['الاسم','البريد الإلكتروني','رسالتك','إرسال','رأيك في الموقع','التقييم'],en:['Name','Email','Your message','Send','Your opinion of the site','Rating'],fr:['Nom','E-mail','Votre message','Envoyer','Votre avis sur le site','Note']};
+const hp='<input name="hp" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">';
+const msgForm=c=>{const x=FM[lang];return `<form onsubmit="sendForm(event,'${c}')"><input name="name" required maxlength="100" placeholder="${x[0]}" autocomplete="name"><input name="email" type="email" required maxlength="150" placeholder="${x[1]}" autocomplete="email"><textarea name="msg" required maxlength="1500" rows="4" placeholder="${x[2]}"></textarea>${hp}<button class="btn">${x[3]}</button></form>`};
+const fbForm=()=>{const x=FM[lang];return `<h3 style="margin-top:26px">${x[4]}</h3><form onsubmit="sendForm(event,'feedback')"><input name="name" required maxlength="100" placeholder="${x[0]}"><select name="rate" aria-label="${x[5]}">${[5,4,3,2,1].map(n=>`<option value="${n}">${'★'.repeat(n)}</option>`).join('')}</select><textarea name="msg" required maxlength="900" rows="3" placeholder="${x[2]}"></textarea>${hp}<button class="btn">${x[3]}</button></form>`};
+const PRES=[
+ {n:'',r:['الرئيس الأول ومؤسس النادي','Founder and first president','Fondateur et premier président'],y:'2017 – 2022',i:'p1'},
+ {n:'Hanachi Lina',r:['الرئيسة الثانية','Second president','Deuxième présidente'],y:'2022 – 2023',i:'p2'},
+ {n:'Guettat Ishak',r:['الرئيس الثالث','Third president','Troisième président'],y:'2023 – 2025',i:'p3'},
+ {n:'Cherif Ali',r:['الرئيس الرابع','Fourth president','Quatrième président'],y:'2025',i:'p4'},
+ {n:'Kamel Soltani',r:['الرئيس الخامس (الحالي)','Fifth and current president','Cinquième président (actuel)'],y:'2025 – ⟶',i:'p5'}];
+function presPage(){const k={ar:0,en:1,fr:2}[lang],now={ar:'الآن',en:'present',fr:'aujourd’hui'}[lang];
+ return `<div class="grid">${PRES.map(p=>`<div class="card"><img src="assets/${p.i}.webp" alt="${esc(p.n||p.r[k])}" loading="lazy" style="width:100%;aspect-ratio:4/5;object-fit:cover;object-position:top;border-radius:12px;margin-bottom:10px"><span class="tag">${p.y.replace('⟶',now)}</span><h3>${esc(p.n||p.r[k])}</h3>${p.n?`<p class="sub" style="margin:0">${p.r[k]}</p>`:''}</div>`).join('')}</div>`}
+function render(){
+ const k=location.hash.replace('#/','');
+ $('#app').innerHTML=k===''?home():(ROUTES.includes(k)?page(k):home());
+ chrome();countdown();scrollTo(0,0);
+}
+document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.l){lang=b.dataset.l;localStorage.lang=lang;render()}
+ if(b.dataset.ics)icsDl(b.dataset.ics);if(b.id==='th'){theme=theme==='dark'?'light':'dark';localStorage.theme=theme;chrome()}});
+addEventListener('hashchange',render);load().then(render);
+</script>
+</body>
+</html>
