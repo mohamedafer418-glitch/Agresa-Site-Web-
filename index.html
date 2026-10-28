@@ -86,7 +86,7 @@ const SITE={
  news:[],fb:[],people:[],events:[],founders:[],members:[],works:[],gallery:[],honor:[]
 };
 const T={
- ar:{nav:['الرئيسية','قصتنا','الفعاليات','المؤسسون','الأعضاء','الأعمال','المعرض','الأخبار','انضم','تواصل'],
+ ar:{nav:['الرئيسية','قصتنا','الفعاليات','المؤسسون','الأعضاء','الأعمال','المعرض','الأخبار','تواصل'],
   school:'المدرسة العليا للعلوم الفلاحية مستغانم · HSAM',
   h:'جذورنا في الأرض، وعلمنا يمتد',p:'نادٍ علمي فلاحي تأسس عام 2017، سكن قليلاً ثم عاد في يوم الاستقبال 2026 بجيل جديد يحمل الشعلة.',
   ph:'مكان صورة الغلاف الحقيقية: ترفعها من لوحة الإدارة',join:'انضم إلينا',story:'اقرأ قصتنا',
@@ -98,7 +98,7 @@ const T={
   tl:[['2017','طموح وبضع أفكار','لم يكن معهم إلا الطموح. شباب من طلبة الفلاحة قرروا أن يكون للعلم بيت في مدرستهم، فبنوه بأيديهم وبحماس لا يهدأ.'],['جيل بعد جيل','الشعلة تنتقل','كل رئيس وكل فريق أضاف حلقة جديدة: ورشات وأفكار وضحكات وليالٍ طويلة من العمل. وما بدأ صغيراً كبر كما تكبر البذرة.'],['اليوم وغداً','والحكاية مستمرة','الجذور تعمّقت، والأغصان تمتد، والأوراق الجديدة تفتح كل يوم. كل طالب يدخل أڨريسا يكتب سطراً جديداً في القصة.']],
   jt:'انضم إلى أڨريسا',jn:'الاسم الكامل',je:'البريد الإلكتروني',jm:'لماذا تريد الانضمام؟',jb:'إرسال الطلب',jnote:'النموذج الكامل متعدد الخطوات يُربط بصندوق الإدارة في المرحلة 3.',
   ct:'تواصل معنا',soon:'يُضاف الرابط من لوحة الإدارة',foot:'نادٍ طلابي علمي فلاحي · تأسس 2017'},
- en:{nav:['Home','Our story','Events','Founders','Members','Projects','Gallery','News','Join','Contact'],
+ en:{nav:['Home','Our story','Events','Founders','Members','Projects','Gallery','News','Contact'],
   school:'Higher School of Agricultural Sciences Mostaganem · HSAM',
   h:'Rooted in the soil, reaching for science',p:'A science and agriculture club founded in 2017. It rested for a while, then returned on Welcome Day 2026 with a new generation carrying the torch.',
   ph:'Real cover photo goes here: upload it from the admin panel',join:'Join us',story:'Read our story',
@@ -110,7 +110,7 @@ const T={
   tl:[['2017','Ambition and a few ideas','They had nothing but ambition. A group of agriculture students decided science deserved a home on campus, and built it with their own hands and tireless energy.'],['Generation after generation','The torch passes on','Each president and each team added a new link: workshops, ideas, laughter and long nights of work. What started small grew the way a seed does.'],['Today and tomorrow','The story goes on','The roots run deeper, the branches reach further, and new leaves open every day. Every student who joins AGRESA writes a new line in the story.']],
   jt:'Join AGRESA',jn:'Full name',je:'Email',jm:'Why do you want to join?',jb:'Send request',jnote:'The full multi-step form connects to the admin inbox in phase 3.',
   ct:'Contact us',soon:'Link is added from the admin panel',foot:'Student science & agriculture club · Est. 2017'},
- fr:{nav:['Accueil','Notre histoire','Événements','Fondateurs','Membres','Projets','Galerie','Actualités','Rejoindre','Contact'],
+ fr:{nav:['Accueil','Notre histoire','Événements','Fondateurs','Membres','Projets','Galerie','Actualités','Contact'],
   school:'École supérieure des sciences agronomiques de Mostaganem · HSAM',
   h:'Enraciné dans la terre, tourné vers la science',p:'Un club scientifique et agricole fondé en 2017. Il s’est mis en pause, puis est revenu à la journée d’accueil 2026 avec une nouvelle génération.',
   ph:'La vraie photo de couverture s’ajoute depuis l’espace admin',join:'Nous rejoindre',story:'Lire notre histoire',
@@ -123,11 +123,13 @@ const T={
   jt:'Rejoindre AGRESA',jn:'Nom complet',je:'E-mail',jm:'Pourquoi nous rejoindre ?',jb:'Envoyer',jnote:'Le formulaire complet en étapes sera relié à l’admin en phase 3.',
   ct:'Contact',soon:'Lien ajouté depuis l’espace admin',foot:'Club étudiant scientifique et agricole · Depuis 2017'}
 };
-const ROUTES=['','story','events','founders','members','works','gallery','news','join','contact'];
+const ROUTES=['','story','events','founders','members','works','gallery','news','contact'];
 const NAMES={instagram:'Instagram',tiktok:'TikTok',facebook:'Facebook'};
 let lang=localStorage.lang||'ar',theme=localStorage.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'),timer;
 const $=s=>document.querySelector(s),t=()=>T[lang];
 
+function socCards(){return `<div class="grid">${Object.keys(NAMES).map(k=>{const u=SITE.social[k];let h='AGRESA club';if(k!=='facebook'&&u){h=decodeURIComponent(u.split('?')[0].replace(/\/+$/,'').split('/').pop());if(!h.startsWith('@'))h='@'+h}
+ const x=`<h3>${NAMES[k]}</h3><p class="sub" style="margin:0" dir="ltr">${esc(h)}</p>`;return u?`<a class="card" href="${esc(u)}" target="_blank" rel="noopener" style="text-decoration:none;display:block">${x}</a>`:`<div class="card" style="opacity:.5">${x}</div>`}).join('')}</div>`}
 function soc(){const tx=t();return Object.keys(NAMES).map(k=>SITE.social[k]?`<a href="${SITE.social[k]}" target="_blank" rel="noopener">${NAMES[k]}</a>`:`<span class="off" title="${tx.soon}">${NAMES[k]}</span>`).join('')}
 function fmt(d,o){return new Intl.DateTimeFormat({ar:'ar-DZ-u-nu-latn',en:'en-GB',fr:'fr-DZ'}[lang],{timeZone:SITE.tz,...o}).format(new Date(d))}
 function when(e){if(e.allDay)return fmt(e.start,{weekday:'long',day:'numeric',month:'long'});return fmt(e.start,{weekday:'long',day:'numeric',month:'long'})+' · '+fmt(e.start,{hour:'numeric',minute:'2-digit'})+' – '+fmt(e.end,{hour:'numeric',minute:'2-digit'})}
@@ -151,7 +153,7 @@ function countdown(){
 function home(){
  const tx=t(),e=nextEv(),yrs=new Date().getFullYear()-2017;
  return `<div class="hero"><div class="wrap"><div><div class="badge-big"><img src="logo.png" alt="AGRESA"></div><h1>${tx.h}</h1><p>${tx.p}</p>
- <a class="btn" href="#/join">${tx.join}</a><a class="btn alt" href="#/story">${tx.story}</a></div>${SITE.cover?`<img src="${esc(SITE.cover)}" alt="AGRESA" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:22px">`:`<div class="photo">${tx.ph}</div>`}</div></div>
+ <a class="btn" href="#/story">${tx.story}</a></div>${SITE.cover?`<img src="${esc(SITE.cover)}" alt="AGRESA" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:22px">`:`<div class="photo">${tx.ph}</div>`}</div></div>
  <section><div class="wrap"><div class="ev"><h2>${tx.next}</h2>${e?`<p>${esc(tt(e))}${e.demo?` <span class="tag">${tx.demo}</span>`:''}</p><p class="sub" style="margin:4px auto">${when(e)} · ${esc(pl(e))}</p>`:''}<div id="cd"></div>
  ${e?`<a class="btn" href="#/events">${tx.reg}</a><a class="btn alt" href="#/events">${tx.cal}</a>`:''}</div></div></section>
  <section><div class="wrap"><h2>${tx.news}</h2>${newsList()}</div></section>
@@ -162,7 +164,7 @@ function page(k){
  const tx=t(),[ti,su]=tx.pages[k];let body;
  if(k==='story')body=`<div class="tl">${tx.tl.map(r=>`<div><b>${r[0]}</b><h3>${r[1]}</h3><p>${r[2]}</p></div>`).join('')}</div>`;
  else if(k==='join')body=`<h2>${tx.jt}</h2>${msgForm('joins')}`;
- else if(k==='contact')body=`<div class="soc">${soc()}</div><p class="sub" style="margin-top:14px">${tx.school}</p>${msgForm('messages')}${fbForm()}${fbList()}`;
+ else if(k==='contact')body=`${socCards()}<p class="sub" style="margin-top:14px">${tx.school}</p>${msgForm('messages')}${fbForm()}${fbList()}`;
  else if(k==='founders')body=peoplePage(['founder']);else if(k==='members')body=peoplePage(['member','board']);else if(k==='news')body=newsList();else if(k==='events')body=evPage();else if(k==='gallery')body=galPage();else body=list(SITE[k]||[]);
  const head=k==='join'?'':`<h2>${k==='contact'?tx.ct:ti}</h2><p class="sub">${k==='contact'?'':su}</p>`;
  return `<section><div class="wrap">${head}${body}</div></section>`;

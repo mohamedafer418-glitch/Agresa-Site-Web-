@@ -95,7 +95,8 @@ $('#out').onclick=()=>A.signOut(auth);
 const go=()=>view==='home'?home():view==='inbox'?inbox('messages'):view==='settings'?settingsView():view==='ai'?aiView():view==='preview'?previewView():list(view);
 async function settingsView(){nav();const d=await F.getDoc(F.doc(db,'settings','site'));form('settings',{id:'site',...(d.exists()?d.data():{})})}
 
-A.onAuthStateChanged(auth,async u=>{
+let cur;
+A.onAuthStateChanged(auth,async u=>{const key=u?u.uid:'';if(key===cur)return;cur=key;
  if(!u){$('#out').hidden=true;$('#nav').hidden=true;$('#me').textContent='';m.innerHTML='<div class="card"><p>سجّل الدخول بحساب Google المعتمد.</p><button id="in">الدخول بـ Google</button></div>';$('#in').onclick=()=>A.signInWithPopup(auth,new A.GoogleAuthProvider()).catch(e=>toast('تعذر الدخول'));return}
  try{const d=await F.getDoc(F.doc(db,'admins',u.email.toLowerCase()));if(!d.exists())throw 0}
  catch(e){m.innerHTML='<div class="card">هذا الحساب غير معتمد كأدمن.</div>';setTimeout(()=>A.signOut(auth),2500);return}
@@ -137,12 +138,14 @@ function form(c,o){
   try{toast('جارٍ الترجمة...');const r=await ai(`${CTX}\nTranslate each Arabic value to English and French. Return JSON {key:{"en":"","fr":""}} for exactly these keys: ${JSON.stringify(src)}`);
    for(const k in src)for(const l of ['en','fr']){const e=$('#'+id(k+'.'+l));if(e&&r[k]?.[l])e.value=r[k][l]}toast('تمت الترجمة. راجعها ثم احفظ')}catch(x){alert(x.message)}};
  $('#ok').onclick=async()=>{
-  const n={...o};
-  for(const f of fs){const [k,,t]=f,e=$('#'+id(k));
-   if(t==='cb')set(n,k,e.checked);else if(t==='dt')set(n,k,iso(e.value));
-   else if(t==='img'){if(e.files[0])try{set(n,k,await up(e.files[0]))}catch(x){return alert(x.message)}}
-   else if(t==='imgs'){const a=[...(o[k]||[])];for(const x of e.files)try{a.push(await up(x))}catch(y){return alert(y.message)}set(n,k,a)}
-   else set(n,k,e.value.trim())}
+  const n={...o},V=[];
+  for(const [k,,t] of fs){const e=$('#'+id(k));if(!e){alert('حقل مفقود: '+k);return}
+   V.push([k,t,t==='cb'?e.checked:t==='img'?e.files[0]:t==='imgs'?[...e.files]:t==='dt'?iso(e.value):e.value.trim()])}
+  if(V.some(([,t,v])=>(t==='img'&&v)||(t==='imgs'&&v.length)))toast('جارٍ رفع الصور، انتظر...');
+  try{for(const [k,t,v] of V){
+   if(t==='img'){if(v)set(n,k,await up(v))}
+   else if(t==='imgs'){const a=[...(o[k]||[])];for(const x of v)a.push(await up(x));set(n,k,a)}
+   else set(n,k,v)}}catch(x){return alert(x.message)}
   if(c!=='settings'&&!(n.title?.ar||n.role?.ar))return alert('اكتب العنوان بالعربية');
   if(c==='events'){if(!n.start)return alert('حدد وقت البداية');if(n.allDay)n.end=n.start.slice(0,10)+'T23:59:00+01:00';if(!n.end||new Date(n.end)<new Date(n.start))return alert('وقت النهاية قبل وقت البداية. صحّحه ثم احفظ.')}
   try{await put(c,n);toast('تم الحفظ');back(c)}catch(e){alert('تعذر الحفظ: '+e.message)}}}
