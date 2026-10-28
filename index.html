@@ -14,7 +14,7 @@
 :root{--bg:#f3f0dd;--bg2:#e9e5c9;--ink:#06210f;--mute:#3d5a47;--g1:#0a3d22;--g2:#1fb05a;--mint:#7be3a1;--gold:#e6c36a;--card:#fffdf0;--line:#0a3d2233}
 :root[data-t=dark]{--bg:#06210f;--bg2:#0a3d22;--ink:#f3f0dd;--mute:#a9c9b3;--card:#0b2f1a;--line:#7be3a144}
 *{box-sizing:border-box;margin:0}html{scroll-padding-top:70px}
-body{font:400 17px/1.8 Cairo,sans-serif;background:var(--bg);color:var(--ink)}
+body{overflow-x:hidden;font:400 17px/1.8 Cairo,sans-serif;background:var(--bg);color:var(--ink)}
 h1,h2,h3{line-height:1.25;font-weight:800}
 .lat{font-family:Fraunces,serif}
 a{color:inherit}:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
@@ -211,7 +211,7 @@ const FOL={ar:['تابعنا','لتصلك أخبارنا وفعالياتنا أ
 const newsList=n=>SITE.news.length?`<div class="grid">${SITE.news.slice(0,n||99).map(newsCard).join('')}</div>`:`<div class="empty">${t().nonews}</div>`;
 const fbList=()=>(SITE.fb||[]).length?`<div class="grid" style="margin-top:18px">${SITE.fb.map(x=>`<div class="card"><b>${esc(x.name)}</b> <span class="tag">${'★'.repeat(x.rate||5)}</span><p>${esc(x.msg)}</p></div>`).join('')}</div>`:'';
 const FM={ar:['الاسم','البريد الإلكتروني','رسالتك','إرسال','رأيك في الموقع','التقييم'],en:['Name','Email','Your message','Send','Your opinion of the site','Rating'],fr:['Nom','E-mail','Votre message','Envoyer','Votre avis sur le site','Note']};
-const hp='<input name="hp" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">';
+const hp='<input name="hp" tabindex="-1" autocomplete="off" style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;min-height:0;padding:0;border:0;margin:0" aria-hidden="true">';
 const msgForm=c=>{const x=FM[lang];return `<form onsubmit="sendForm(event,'${c}')"><input name="name" required maxlength="100" placeholder="${x[0]}" autocomplete="name"><input name="email" type="email" required maxlength="150" placeholder="${x[1]}" autocomplete="email"><textarea name="msg" required maxlength="1500" rows="4" placeholder="${x[2]}"></textarea>${hp}<button class="btn">${x[3]}</button></form>`};
 const fbForm=()=>{const x=FM[lang];return `<h3 style="margin-top:26px">${x[4]}</h3><form onsubmit="sendForm(event,'feedback')"><input name="name" required maxlength="100" placeholder="${x[0]}"><select name="rate" aria-label="${x[5]}">${[5,4,3,2,1].map(n=>`<option value="${n}">${'★'.repeat(n)}</option>`).join('')}</select><textarea name="msg" required maxlength="900" rows="3" placeholder="${x[2]}"></textarea>${hp}<button class="btn">${x[3]}</button></form>`};
 const PRES=[
