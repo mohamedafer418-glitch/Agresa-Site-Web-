@@ -79,7 +79,7 @@ footer .soc{justify-content:center;margin:14px 0}footer .soc a,footer .soc span{
 <script>
 /* ====== بيانات الموقع: في المرحلة 3 تُستبدل بقراءة من Firestore، والباقي يبقى كما هو ====== */
 const SITE={
- tz:'Africa/Algiers',
+ tz:'Africa/Algiers',email:'agresaclub@gmail.com',
  social:{instagram:'https://www.instagram.com/agresaclub',tiktok:'https://www.tiktok.com/@agr__esa',facebook:'https://www.facebook.com/share/1C1BgzDSf8/'},
  nextEvent:{demo:true,start:'2026-11-15T09:00:00+01:00',end:'2026-11-15T14:00:00+01:00',
   title:{ar:'فعالية تجريبية: سيحدد المدير الموعد الحقيقي',en:'Demo event: the admin will set the real date',fr:'Événement démo : l’admin fixera la vraie date'},
@@ -130,8 +130,8 @@ let lang=localStorage.lang||'ar',theme=localStorage.theme||(matchMedia('(prefers
 const $=s=>document.querySelector(s),t=()=>T[lang];
 
 function socCards(){return `<div class="grid">${Object.keys(NAMES).map(k=>{const u=SITE.social[k];let h='AGRESA club';if(k!=='facebook'&&u){h=decodeURIComponent(u.split('?')[0].replace(/\/+$/,'').split('/').pop());if(!h.startsWith('@'))h='@'+h}
- const x=`<h3>${NAMES[k]}</h3><p class="sub" style="margin:0" dir="ltr">${esc(h)}</p>`;return u?`<a class="card" href="${esc(u)}" target="_blank" rel="noopener" style="text-decoration:none;display:block">${x}</a>`:`<div class="card" style="opacity:.5">${x}</div>`}).join('')}</div>`}
-function soc(){const tx=t();return Object.keys(NAMES).map(k=>SITE.social[k]?`<a href="${SITE.social[k]}" target="_blank" rel="noopener">${NAMES[k]}</a>`:`<span class="off" title="${tx.soon}">${NAMES[k]}</span>`).join('')}
+ const x=`<h3>${NAMES[k]}</h3><p class="sub" style="margin:0" dir="ltr">${esc(h)}</p>`;return u?`<a class="card" href="${esc(u)}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;display:block">${x}</a>`:`<div class="card" style="opacity:.5">${x}</div>`}).join('')}${SITE.email?`<a class="card" href="mailto:${esc(SITE.email)}" style="text-decoration:none;display:block"><h3>${EM[lang]}</h3><p class="sub" style="margin:0" dir="ltr">${esc(SITE.email)}</p></a>`:''}</div>`}
+function soc(){const tx=t();return Object.keys(NAMES).map(k=>SITE.social[k]?`<a href="${esc(SITE.social[k])}" target="_blank" rel="noopener noreferrer">${NAMES[k]}</a>`:`<span class="off" title="${tx.soon}">${NAMES[k]}</span>`).join('')+(SITE.email?`<a href="mailto:${esc(SITE.email)}">${EM[lang]}</a>`:'')}
 function fmt(d,o){return new Intl.DateTimeFormat({ar:'ar-DZ-u-nu-latn',en:'en-GB',fr:'fr-DZ'}[lang],{timeZone:SITE.tz,...o}).format(new Date(d))}
 function when(e){if(e.allDay)return fmt(e.start,{weekday:'long',day:'numeric',month:'long'});return fmt(e.start,{weekday:'long',day:'numeric',month:'long'})+' · '+fmt(e.start,{hour:'numeric',minute:'2-digit'})+' – '+fmt(e.end,{hour:'numeric',minute:'2-digit'})}
 
@@ -200,6 +200,7 @@ async function sendForm(ev,c){ev.preventDefault();const f=ev.target,d=Object.fro
  if(d.rate)d.rate=+d.rate;
  try{await FB.F.addDoc(FB.F.collection(FB.db,c),{...d,read:false,at:FB.F.serverTimestamp(),...(c==='feedback'?{ok:false}:{})});f.reset();f.insertAdjacentHTML('beforeend',`<p class="tag">${SENT[lang]}</p>`)}catch(e){alert('Error')}}
 function newsCard(x){return `<div class="card">${ed('posts',x.id)}${x.img?`<img src="${esc(x.img)}" alt="" loading="lazy" style="width:100%;border-radius:12px;margin-bottom:10px">`:''}${x.pinned?`<span class="tag">📌</span> `:''}<h3>${esc(x.title?.[lang]||x.title?.ar)}</h3><p>${esc(x.body?.[lang]||x.body?.ar).replace(/\n/g,'<br>')}</p></div>`}
+const EM={ar:'البريد الإلكتروني',en:'Email',fr:'E-mail'};
 const QRT={ar:'امسح الرمز بكاميرا هاتفك',en:'Scan the code with your phone camera',fr:'Scannez le code avec votre téléphone'};
 const ALL={ar:'كل الأخبار',en:'All news',fr:'Toutes les actualités'};
 const FOL={ar:['تابعنا','لتصلك أخبارنا وفعالياتنا أولاً بأول، تابع حساباتنا وكن جزءاً من العائلة الخضراء.'],en:['Follow us','Follow our accounts to get our news and events first, and be part of the green family.'],fr:['Suivez-nous','Suivez nos comptes pour recevoir nos actualités et événements en premier et rejoindre la famille verte.']};
@@ -219,7 +220,8 @@ function peoplePage(gs){const now={ar:'الآن',en:'present',fr:'aujourd’hui'
  let l=SITE.people.filter(p=>gs.includes(p.group)).sort((a,b)=>(+a.order||0)-(+b.order||0));
  if(!l.length&&gs.includes('founder')&&!SITE.people.length)l=PRES.map(p=>({title:{ar:p.n,en:p.n,fr:p.n},role:{ar:p.r[0],en:p.r[1],fr:p.r[2]},years:p.y,img:''+p.i+'.webp'}));
  return l.length?`<div class="grid">${l.map(p=>{const nm=p.title?.[lang]||p.title?.ar||'',rl=p.role?.[lang]||p.role?.ar||'';return `<div class="card">${ed('people',p.id)}${p.img?`<img src="${esc(p.img)}" alt="${esc(nm||rl)}" loading="lazy" style="width:100%;height:auto;border-radius:12px;margin-bottom:10px">`:''}${p.years?`<span class="tag">${esc(p.years).replace('⟶',now)}</span>`:''}<h3>${esc(nm||rl)}</h3>${nm?`<p class="sub" style="margin:0">${esc(rl)}</p>`:''}</div>`}).join('')}</div>`:`<div class="empty">${t().empty}</div>`}
-function applySet(d){if(d.cover)SITE.cover=d.cover;for(const k in d.social||{})if(d.social[k])SITE.social[k]=d.social[k];
+function fixUrl(k,v){v=String(v).trim();if(/^https?:\/\//i.test(v))return v;if(/\./.test(v))return 'https://'+v.replace(/^\/+/,'');return {instagram:'https://www.instagram.com/',tiktok:'https://www.tiktok.com/@',facebook:'https://www.facebook.com/'}[k]+v.replace(/^@/,'')}
+function applySet(d){if(d.cover)SITE.cover=d.cover;if(d.email)SITE.email=d.email;for(const k in d.social||{})if(d.social[k])SITE.social[k]=fixUrl(k,d.social[k]);
  for(const l of ['ar','en','fr']){for(const k of ['h','p','school','foot'])if(d.tx?.[k]?.[l])T[l][k]=d.tx[k][l];
   [1,2,3].forEach(n=>{const ti=d['st'+n+'t'],b=d['st'+n+'b'];if(ti?.[l]||ti?.ar)T[l].tl[n-1]=[d['st'+n+'y']||T[l].tl[n-1][0],ti[l]||ti.ar,b?.[l]||b?.ar||'']})}}
 function render(){
