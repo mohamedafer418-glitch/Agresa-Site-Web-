@@ -28,7 +28,8 @@ const $=s=>document.querySelector(s),m=$('#m');
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const toast=t=>{const e=$('#toast');e.textContent=t;e.style.display='block';setTimeout(()=>e.style.display='none',3200)};
 const fail=t=>{m.innerHTML='<div class="card"><b>تعذر التشغيل</b><p dir="ltr" style="word-break:break-all;white-space:pre-wrap">'+esc(t)+'</p></div>'};
-addEventListener('error',e=>fail(e.message));addEventListener('unhandledrejection',e=>fail(String(e.reason&&e.reason.message||e.reason)));
+const banner=t=>{let b=$('#err');if(!b){b=document.createElement('div');b.id='err';b.style.cssText='position:fixed;top:0;inset-inline:0;background:#b3261e;color:#fff;padding:10px;font-size:13px;z-index:20;direction:ltr;white-space:pre-wrap';b.onclick=()=>b.remove();document.body.append(b)}b.textContent=t+'  (tap to close)'};
+addEventListener('error',e=>banner((e.message||'')+' @'+String(e.filename||'').split('/').pop()+':'+e.lineno+':'+e.colno));addEventListener('unhandledrejection',e=>banner(String(e.reason?.stack||e.reason).slice(0,400)));
 let CFG;try{({CFG}=await import('./config.js'))}catch(e){fail('config.js not found. ارفع مجلد js كاملاً إلى GitHub.\n'+e.message);throw e}
 if(!CFG.firebase.apiKey){m.innerHTML='<div class="card">أكمل ملف config.js بإعدادات Firebase أولاً، وخطوات ذلك في ملف README.</div>';throw 0}
 const V='https://www.gstatic.com/firebasejs/10.14.1/';
@@ -49,13 +50,19 @@ const S={
  posts:{n:'المنشورات',one:'منشور',f:[...L3('title','العنوان','t'),...L3('body','النص','ta'),['img','الصورة','img'],['type','النوع','sel',[['news','خبر'],['announce','إعلان'],['update','تحديث فعالية']]],['pinned','تثبيت في الأعلى','cb'],['publishAt','وقت الظهور (فارغ = الآن)','dt'],['pub','منشور للزوار','cb']]},
  events:{n:'الفعاليات',one:'فعالية',f:[...L3('title','العنوان','t'),['poster','الملصق','img'],['start','البداية','dt'],['end','النهاية','dt'],['allDay','فعالية ليوم كامل','cb'],['place','المكان','t'],['map','رابط الخريطة','t','ltr'],['desc','الوصف','ta'],['reg','رابط التسجيل','t','ltr'],['seats','عدد المقاعد','t'],['status','الحالة','sel',[['auto','تلقائية من التاريخ'],['postponed','مؤجلة'],['cancelled','ملغاة']]],['note','سطر توضيحي للزوار','t'],['publishAt','وقت الظهور (فارغ = الآن)','dt'],['album','صور الألبوم','imgs'],['pub','منشورة للزوار','cb']]}
 };
+S.people={n:'الأشخاص',one:'شخص',f:[...L3('title','الاسم','t'),...L3('role','الصفة','t'),['years','السنوات (مثل 2017 – 2022)','t'],['img','الصورة','img'],['group','المجموعة','sel',[['founder','مؤسس أو رئيس'],['member','عضو'],['board','الهيئة الإدارية']]],['order','الترتيب (رقم)','t'],['pub','موافق على النشر وإظهاره في الموقع','cb']]};
+const stF=[];for(const n of [1,2,3])stF.push(['st'+n+'y','سنة أو عنوان صغير للمحطة '+n,'t'],...L3('st'+n+'t','عنوان المحطة '+n,'t'),...L3('st'+n+'b','نص المحطة '+n,'ta'));
+S.settings={n:'الموقع',one:'الإعدادات',f:[['social.instagram','رابط إنستغرام','t','ltr'],['social.tiktok','رابط تيك توك','t','ltr'],['social.facebook','رابط فيسبوك','t','ltr'],...L3('tx.h','العنوان الرئيسي','t'),...L3('tx.p','الوصف تحت العنوان','ta'),...L3('tx.school','اسم المدرسة في الأسفل','t'),...L3('tx.foot','سطر التذييل','t'),...stF]};
+const SEED=[['','','الرئيس الأول ومؤسس النادي','Founder and first president','Fondateur et premier président','2017 – 2022','p1'],['Hanachi Lina','Hanachi Lina','الرئيسة الثانية','Second president','Deuxième présidente','2022 – 2023','p2'],['Guettat Ishak','Guettat Ishak','الرئيس الثالث','Third president','Troisième président','2023 – 2025','p3'],['Cherif Ali','Cherif Ali','الرئيس الرابع','Fourth president','Quatrième président','2025','p4'],['Kamel Soltani','Kamel Soltani','الرئيس الخامس (الحالي)','Fifth and current president','Cinquième président (actuel)','2025 –','p5']];
+const back=c=>{if(c==='settings'){view='home';home()}else list(c)};
 const stt=e=>e.status==='cancelled'?'ملغاة':e.status==='postponed'?'مؤجلة':Date.now()<new Date(e.start)?'قادمة':Date.now()<=new Date(e.end)?'جارية':'منتهية';
-const TABS=[['home','الرئيسية'],['posts','المنشورات'],['events','الفعاليات'],['inbox','الوارد']];
+const TABS=[['home','الرئيسية'],['posts','المنشورات'],['events','الفعاليات'],['people','الأشخاص'],['settings','الموقع'],['inbox','الوارد']];
 let view='home';
 function nav(badge){$('#nav').hidden=false;$('#nav').innerHTML=TABS.map(([k,n])=>`<button class="${k===view?'on':''}" data-v="${k}">${n}${k==='inbox'&&badge?` <span class="dot"></span>`:''}</button>`).join('')}
 $('#nav').onclick=e=>{if(e.target.dataset.v){view=e.target.dataset.v;go()}};
 $('#out').onclick=()=>A.signOut(auth);
-const go=()=>view==='home'?home():view==='inbox'?inbox('messages'):list(view);
+const go=()=>view==='home'?home():view==='inbox'?inbox('messages'):view==='settings'?settingsView():list(view);
+async function settingsView(){nav();const d=await F.getDoc(F.doc(db,'settings','site'));form('settings',{id:'site',...(d.exists()?d.data():{})})}
 
 A.onAuthStateChanged(auth,async u=>{
  if(!u){$('#out').hidden=true;$('#nav').hidden=true;$('#me').textContent='';m.innerHTML='<div class="card"><p>سجّل الدخول بحساب Google المعتمد.</p><button id="in">الدخول بـ Google</button></div>';$('#in').onclick=()=>A.signInWithPopup(auth,new A.GoogleAuthProvider()).catch(e=>toast('تعذر الدخول'));return}
@@ -72,15 +79,16 @@ async function home(){
  m.onclick=e=>{if(e.target.dataset.q)form(e.target.dataset.q,{id:uid(),pub:false,status:'auto',album:[],created:Date.now()})}}
 
 async function list(c){
- nav();const d=(await col(c)).sort((a,b)=>c==='events'?(b.start||'').localeCompare(a.start||''):(b.created||0)-(a.created||0));
- m.innerHTML=`<button id="add">${S[c].one} جديد${c==='events'?'ة':''}</button><div style="height:12px"></div>`+(d.map(o=>`<div class="card"><div class="row">${c==='events'?`<span class="tag">${stt(o)}</span>`:o.pinned?'<span class="tag">مثبّت</span>':''}<span class="tag" style="background:${o.pub?'#7be3a1':'#ddd'}">${o.pub?'منشور':'مسودة'}</span></div><h3 style="margin:6px 0">${esc(o.title?.ar||'بلا عنوان')}</h3>${o.start?`<div>${esc(o.start.replace('T',' ').slice(0,16))}</div>`:''}<div class="row" style="margin-top:8px"><button class="s" data-e="${o.id}">تعديل</button><button class="s o" data-c="${o.id}">تكرار</button><button class="s r" data-d="${o.id}">حذف</button></div></div>`).join('')||'<div class="card">لا شيء بعد.</div>');
+ nav();const d=(await col(c)).sort((a,b)=>c==='events'?(b.start||'').localeCompare(a.start||''):c==='people'?(+a.order||0)-(+b.order||0):(b.created||0)-(a.created||0));
+ m.innerHTML=`<button id="add">${S[c].one} جديد${c==='events'?'ة':''}</button> ${c==='people'&&!d.length?'<button class="o" id="seed">استيراد الرؤساء الخمسة</button>':''}<div style="height:12px"></div>`+(d.map(o=>`<div class="card"><div class="row">${c==='events'?`<span class="tag">${stt(o)}</span>`:o.pinned?'<span class="tag">مثبّت</span>':''}<span class="tag" style="background:${o.pub?'#7be3a1':'#ddd'}">${o.pub?'منشور':'مسودة'}</span></div><h3 style="margin:6px 0">${esc(o.title?.ar||o.role?.ar||'بلا عنوان')}</h3>${o.years?`<div>${esc(o.years)}</div>`:''}${o.start?`<div>${esc(o.start.replace('T',' ').slice(0,16))}</div>`:''}<div class="row" style="margin-top:8px"><button class="s" data-e="${o.id}">تعديل</button><button class="s o" data-c="${o.id}">تكرار</button><button class="s r" data-d="${o.id}">حذف</button></div></div>`).join('')||'<div class="card">لا شيء بعد.</div>');
  $('#add').onclick=()=>form(c,{id:uid(),pub:false,status:'auto',album:[],created:Date.now()});
+ if($('#seed'))$('#seed').onclick=async()=>{for(const [i,s] of SEED.entries())await put('people',{id:uid(),title:{ar:s[0],en:s[1],fr:s[1]},role:{ar:s[2],en:s[3],fr:s[4]},years:s[5],img:''+s[6]+'.webp',group:'founder',order:String(i+1),pub:true,created:Date.now()});toast('تم الاستيراد');list('people')};
  m.onclick=async e=>{const t=e.target.dataset,o=d.find(x=>x.id===(t.e||t.c||t.d));
   if(t.e)form(c,o);if(t.c)form(c,{...structuredClone(o),id:uid(),pub:false,created:Date.now(),start:'',end:'',album:[],publishAt:'',note:''});
   if(t.d&&confirm('حذف نهائي؟')){await rm(c,t.d);toast('تم الحذف');list(c)}}}
 
 function form(c,o){
- nav();const fs=S[c].f,id=k=>'f_'+k.replace('.','_');
+ nav();const fs=S[c].f,id=k=>'f_'+k.replace(/\./g,'_');
  const inp=([k,l,t,x,opt])=>{const v=get(o,k),i=id(k);
   if(t==='cb')return`<label class="c"><input type="checkbox" id="${i}" ${v?'checked':''}>${l}</label>`;
   let h=`<label>${l}</label>`;
@@ -92,7 +100,7 @@ function form(c,o){
   if(t==='imgs')h+=`${(v||[]).map(u=>`<img class="th" src="${esc(u)}">`).join('')}<input type="file" id="${i}" accept="image/*" multiple>`;
   return h};
  m.innerHTML=`<div class="card">${fs.map(f=>inp([f[0],f[1],f[2],f[3],f[3]])).join('').replace(/<label>/g,'<label>')}<div class="row"><button id="ok">حفظ</button><button class="o" id="bk">رجوع</button></div></div>`;
- $('#bk').onclick=()=>list(c);
+ $('#bk').onclick=()=>back(c);
  $('#ok').onclick=async()=>{
   const n={...o};
   for(const f of fs){const [k,,t]=f,e=$('#'+id(k));
@@ -100,9 +108,9 @@ function form(c,o){
    else if(t==='img'){if(e.files[0])try{set(n,k,await up(e.files[0]))}catch(x){return alert(x.message)}}
    else if(t==='imgs'){const a=[...(o[k]||[])];for(const x of e.files)try{a.push(await up(x))}catch(y){return alert(y.message)}set(n,k,a)}
    else set(n,k,e.value.trim())}
-  if(!n.title?.ar)return alert('اكتب العنوان بالعربية');
+  if(c!=='settings'&&!(n.title?.ar||n.role?.ar))return alert('اكتب العنوان بالعربية');
   if(c==='events'){if(!n.start)return alert('حدد وقت البداية');if(n.allDay)n.end=n.start.slice(0,10)+'T23:59:00+01:00';if(!n.end||new Date(n.end)<new Date(n.start))return alert('وقت النهاية قبل وقت البداية. صحّحه ثم احفظ.')}
-  try{await put(c,n);toast('تم الحفظ');list(c)}catch(e){alert('تعذر الحفظ: '+e.message)}}}
+  try{await put(c,n);toast('تم الحفظ');back(c)}catch(e){alert('تعذر الحفظ: '+e.message)}}}
 
 async function inbox(k){
  const d=(await col(k)).sort((a,b)=>(b.at?.seconds||0)-(a.at?.seconds||0)),un=x=>x.filter(i=>!i.read).length;nav();

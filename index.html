@@ -82,10 +82,10 @@ const SITE={
  nextEvent:{demo:true,start:'2026-11-15T09:00:00+01:00',end:'2026-11-15T14:00:00+01:00',
   title:{ar:'فعالية تجريبية: سيحدد المدير الموعد الحقيقي',en:'Demo event: the admin will set the real date',fr:'Événement démo : l’admin fixera la vraie date'},
   place:{ar:'HSAM مستغانم',en:'HSAM Mostaganem',fr:'HSAM Mostaganem'}},
- news:[],fb:[],events:[],founders:[],members:[],works:[],gallery:[],honor:[]
+ news:[],fb:[],people:[],events:[],founders:[],members:[],works:[],gallery:[],honor:[]
 };
 const T={
- ar:{nav:['الرئيسية','قصتنا','الفعاليات','المؤسسون','الأعضاء','الأعمال','المعرض','الأخبار','انضم','تواصل','قاعة الشرف'],
+ ar:{nav:['الرئيسية','قصتنا','الفعاليات','المؤسسون','الأعضاء','الأعمال','المعرض','الأخبار','انضم','تواصل'],
   school:'المدرسة العليا للعلوم الفلاحية مستغانم · HSAM',
   h:'جذورنا في الأرض، وعلمنا يمتد',p:'نادٍ علمي فلاحي تأسس عام 2017، سكن قليلاً ثم عاد في يوم الاستقبال 2026 بجيل جديد يحمل الشعلة.',
   ph:'مكان صورة الغلاف الحقيقية: ترفعها من لوحة الإدارة',join:'انضم إلينا',story:'اقرأ قصتنا',
@@ -97,7 +97,7 @@ const T={
   tl:[['2017','طموح وبضع أفكار','لم يكن معهم إلا الطموح. شباب من طلبة الفلاحة قرروا أن يكون للعلم بيت في مدرستهم، فبنوه بأيديهم وبحماس لا يهدأ.'],['جيل بعد جيل','الشعلة تنتقل','كل رئيس وكل فريق أضاف حلقة جديدة: ورشات وأفكار وضحكات وليالٍ طويلة من العمل. وما بدأ صغيراً كبر كما تكبر البذرة.'],['اليوم وغداً','والحكاية مستمرة','الجذور تعمّقت، والأغصان تمتد، والأوراق الجديدة تفتح كل يوم. كل طالب يدخل أڨريسا يكتب سطراً جديداً في القصة.']],
   jt:'انضم إلى أڨريسا',jn:'الاسم الكامل',je:'البريد الإلكتروني',jm:'لماذا تريد الانضمام؟',jb:'إرسال الطلب',jnote:'النموذج الكامل متعدد الخطوات يُربط بصندوق الإدارة في المرحلة 3.',
   ct:'تواصل معنا',soon:'يُضاف الرابط من لوحة الإدارة',foot:'نادٍ طلابي علمي فلاحي · تأسس 2017'},
- en:{nav:['Home','Our story','Events','Founders','Members','Projects','Gallery','News','Join','Contact','Hall of fame'],
+ en:{nav:['Home','Our story','Events','Founders','Members','Projects','Gallery','News','Join','Contact'],
   school:'Higher School of Agricultural Sciences Mostaganem · HSAM',
   h:'Rooted in the soil, reaching for science',p:'A science and agriculture club founded in 2017. It rested for a while, then returned on Welcome Day 2026 with a new generation carrying the torch.',
   ph:'Real cover photo goes here: upload it from the admin panel',join:'Join us',story:'Read our story',
@@ -109,7 +109,7 @@ const T={
   tl:[['2017','Ambition and a few ideas','They had nothing but ambition. A group of agriculture students decided science deserved a home on campus, and built it with their own hands and tireless energy.'],['Generation after generation','The torch passes on','Each president and each team added a new link: workshops, ideas, laughter and long nights of work. What started small grew the way a seed does.'],['Today and tomorrow','The story goes on','The roots run deeper, the branches reach further, and new leaves open every day. Every student who joins AGRESA writes a new line in the story.']],
   jt:'Join AGRESA',jn:'Full name',je:'Email',jm:'Why do you want to join?',jb:'Send request',jnote:'The full multi-step form connects to the admin inbox in phase 3.',
   ct:'Contact us',soon:'Link is added from the admin panel',foot:'Student science & agriculture club · Est. 2017'},
- fr:{nav:['Accueil','Notre histoire','Événements','Fondateurs','Membres','Projets','Galerie','Actualités','Rejoindre','Contact','Palmarès'],
+ fr:{nav:['Accueil','Notre histoire','Événements','Fondateurs','Membres','Projets','Galerie','Actualités','Rejoindre','Contact'],
   school:'École supérieure des sciences agronomiques de Mostaganem · HSAM',
   h:'Enraciné dans la terre, tourné vers la science',p:'Un club scientifique et agricole fondé en 2017. Il s’est mis en pause, puis est revenu à la journée d’accueil 2026 avec une nouvelle génération.',
   ph:'La vraie photo de couverture s’ajoute depuis l’espace admin',join:'Nous rejoindre',story:'Lire notre histoire',
@@ -122,7 +122,7 @@ const T={
   jt:'Rejoindre AGRESA',jn:'Nom complet',je:'E-mail',jm:'Pourquoi nous rejoindre ?',jb:'Envoyer',jnote:'Le formulaire complet en étapes sera relié à l’admin en phase 3.',
   ct:'Contact',soon:'Lien ajouté depuis l’espace admin',foot:'Club étudiant scientifique et agricole · Depuis 2017'}
 };
-const ROUTES=['','story','events','founders','members','works','gallery','news','join','contact','honor'];
+const ROUTES=['','story','events','founders','members','works','gallery','news','join','contact'];
 const NAMES={instagram:'Instagram',tiktok:'TikTok',facebook:'Facebook'};
 let lang=localStorage.lang||'ar',theme=localStorage.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'),timer;
 const $=s=>document.querySelector(s),t=()=>T[lang];
@@ -162,7 +162,7 @@ function page(k){
  if(k==='story')body=`<div class="tl">${tx.tl.map(r=>`<div><b>${r[0]}</b><h3>${r[1]}</h3><p>${r[2]}</p></div>`).join('')}</div>`;
  else if(k==='join')body=`<h2>${tx.jt}</h2>${msgForm('joins')}`;
  else if(k==='contact')body=`<div class="soc">${soc()}</div><p class="sub" style="margin-top:14px">${tx.school}</p>${msgForm('messages')}${fbForm()}${fbList()}`;
- else if(k==='founders')body=presPage();else if(k==='news')body=newsList();else if(k==='events')body=evPage();else if(k==='gallery')body=galPage();else body=list(SITE[k]||[]);
+ else if(k==='founders')body=peoplePage(['founder']);else if(k==='members')body=peoplePage(['member','board']);else if(k==='news')body=newsList();else if(k==='events')body=evPage();else if(k==='gallery')body=galPage();else body=list(SITE[k]||[]);
  const head=k==='join'?'':`<h2>${k==='contact'?tx.ct:ti}</h2><p class="sub">${k==='contact'?'':su}</p>`;
  return `<section><div class="wrap">${head}${body}</div></section>`;
 }
@@ -186,7 +186,7 @@ async function load(){try{const {CFG}=await import('./config.js');if(!CFG.fireba
  const V='https://www.gstatic.com/firebasejs/10.14.1/',[{initializeApp},F]=await Promise.all([import(V+'firebase-app.js'),import(V+'firebase-firestore.js')]),db=F.getFirestore(initializeApp(CFG.firebase));window.FB={db,F};
  const g=async(n,f)=>(await F.getDocs(F.query(F.collection(db,n),F.where(f,'==',true)))).docs.map(d=>({id:d.id,...d.data()}));
  const [ev,po,fb]=await Promise.all([g('events','pub'),g('posts','pub'),g('feedback','ok')]);
- SITE.events=ev;SITE.news=po.filter(vis).sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(b.created||0)-(a.created||0));SITE.fb=fb}catch(e){console.warn(e)}}
+ SITE.events=ev;SITE.news=po.filter(vis).sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(b.created||0)-(a.created||0));SITE.fb=fb;SITE.people=await g('people','pub');const sd=await F.getDoc(F.doc(db,'settings','site'));if(sd.exists())applySet(sd.data())}catch(e){console.warn(e)}}
 const SENT={ar:'وصلتنا رسالتك، شكراً لك',en:'Received, thank you',fr:'Bien reçu, merci'};
 async function sendForm(ev,c){ev.preventDefault();const f=ev.target,d=Object.fromEntries(new FormData(f));if(d.hp)return;delete d.hp;
  if(!window.FB){alert('Not connected yet');return}
@@ -205,8 +205,13 @@ const PRES=[
  {n:'Guettat Ishak',r:['الرئيس الثالث','Third president','Troisième président'],y:'2023 – 2025',i:'p3'},
  {n:'Cherif Ali',r:['الرئيس الرابع','Fourth president','Quatrième président'],y:'2025',i:'p4'},
  {n:'Kamel Soltani',r:['الرئيس الخامس (الحالي)','Fifth and current president','Cinquième président (actuel)'],y:'2025 – ⟶',i:'p5'}];
-function presPage(){const k={ar:0,en:1,fr:2}[lang],now={ar:'الآن',en:'present',fr:'aujourd’hui'}[lang];
- return `<div class="grid">${PRES.map(p=>`<div class="card"><img src="${p.i}.webp" alt="${esc(p.n||p.r[k])}" loading="lazy" style="width:100%;aspect-ratio:4/5;object-fit:cover;object-position:top;border-radius:12px;margin-bottom:10px"><span class="tag">${p.y.replace('⟶',now)}</span><h3>${esc(p.n||p.r[k])}</h3>${p.n?`<p class="sub" style="margin:0">${p.r[k]}</p>`:''}</div>`).join('')}</div>`}
+function peoplePage(gs){const now={ar:'الآن',en:'present',fr:'aujourd’hui'}[lang];
+ let l=SITE.people.filter(p=>gs.includes(p.group)).sort((a,b)=>(+a.order||0)-(+b.order||0));
+ if(!l.length&&gs.includes('founder')&&!SITE.people.length)l=PRES.map(p=>({title:{ar:p.n,en:p.n,fr:p.n},role:{ar:p.r[0],en:p.r[1],fr:p.r[2]},years:p.y,img:''+p.i+'.webp'}));
+ return l.length?`<div class="grid">${l.map(p=>{const nm=p.title?.[lang]||p.title?.ar||'',rl=p.role?.[lang]||p.role?.ar||'';return `<div class="card">${p.img?`<img src="${esc(p.img)}" alt="${esc(nm||rl)}" loading="lazy" style="width:100%;aspect-ratio:4/5;object-fit:cover;object-position:top;border-radius:12px;margin-bottom:10px">`:''}${p.years?`<span class="tag">${esc(p.years).replace('⟶',now)}</span>`:''}<h3>${esc(nm||rl)}</h3>${nm?`<p class="sub" style="margin:0">${esc(rl)}</p>`:''}</div>`}).join('')}</div>`:`<div class="empty">${t().empty}</div>`}
+function applySet(d){for(const k in d.social||{})if(d.social[k])SITE.social[k]=d.social[k];
+ for(const l of ['ar','en','fr']){for(const k of ['h','p','school','foot'])if(d.tx?.[k]?.[l])T[l][k]=d.tx[k][l];
+  [1,2,3].forEach(n=>{const ti=d['st'+n+'t'],b=d['st'+n+'b'];if(ti?.[l]||ti?.ar)T[l].tl[n-1]=[d['st'+n+'y']||T[l].tl[n-1][0],ti[l]||ti.ar,b?.[l]||b?.ar||'']})}}
 function render(){
  const k=location.hash.replace('#/','');
  $('#app').innerHTML=k===''?home():(ROUTES.includes(k)?page(k):home());
