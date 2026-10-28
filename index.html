@@ -22,7 +22,7 @@ header{position:sticky;top:0;z-index:5;background:var(--g1);color:#f3f0dd;displa
 .badge{width:46px;height:46px;border-radius:50%;background:#f3f0dd;display:grid;place-items:center;flex:none}
 .badge img{width:38px}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;font:800 20px Fraunces,serif;letter-spacing:.04em}
-nav{display:flex;gap:2px;overflow-x:auto;flex:1;scrollbar-width:none}
+nav{display:flex;gap:2px;overflow-x:auto;-webkit-overflow-scrolling:touch;flex:1 1 100%;order:3;min-width:0;scrollbar-width:none}nav::-webkit-scrollbar{display:none}.brand{margin-inline-end:auto}@media(min-width:900px){nav{order:0;flex:1 1 auto}.brand{margin-inline-end:0}}
 nav a{padding:8px 12px;border-radius:99px;text-decoration:none;white-space:nowrap;font-size:15px}
 nav a.on,nav a:hover{background:#7be3a122;color:var(--mint)}
 .tools{display:flex;gap:6px}
