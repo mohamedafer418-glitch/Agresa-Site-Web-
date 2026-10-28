@@ -21,7 +21,7 @@ label{display:block;font-weight:700;margin-bottom:3px}label.c{display:flex;gap:1
 img.th{height:74px;border-radius:10px;margin:0 0 8px 8px}
 #toast{position:fixed;bottom:14px;inset-inline:14px;background:#06210f;color:#fff;padding:14px;border-radius:12px;text-align:center;display:none;z-index:9}
 </style></head><body>
-<header><b>لوحة إدارة أڨريسا</b><small id="me"></small><button class="o s" id="out" hidden style="color:#fff;border-color:#fff">خروج</button></header>
+<header><b>لوحة إدارة أڨريسا</b><a href="index.html" target="_blank" style="color:#7be3a1;font-size:14px">فتح الموقع</a><small id="me"></small><button class="o s" id="out" hidden style="color:#fff;border-color:#fff">خروج</button></header>
 <nav id="nav" hidden></nav><main id="m"><div class="card">جارٍ التحميل...</div></main><div id="toast"></div>
 <script type="module">
 const $=s=>document.querySelector(s),m=$('#m');
@@ -52,7 +52,7 @@ const S={
 };
 S.people={n:'الأشخاص',one:'شخص',f:[...L3('title','الاسم','t'),...L3('role','الصفة','t'),['years','السنوات (مثل 2017 – 2022)','t'],['img','الصورة','img'],['group','المجموعة','sel',[['founder','مؤسس أو رئيس'],['member','عضو'],['board','الهيئة الإدارية']]],['order','الترتيب (رقم)','t'],['pub','موافق على النشر وإظهاره في الموقع','cb']]};
 const stF=[];for(const n of [1,2,3])stF.push(['st'+n+'y','سنة أو عنوان صغير للمحطة '+n,'t'],...L3('st'+n+'t','عنوان المحطة '+n,'t'),...L3('st'+n+'b','نص المحطة '+n,'ta'));
-S.settings={n:'الموقع',one:'الإعدادات',f:[['social.instagram','رابط إنستغرام','t','ltr'],['social.tiktok','رابط تيك توك','t','ltr'],['social.facebook','رابط فيسبوك','t','ltr'],...L3('tx.h','العنوان الرئيسي','t'),...L3('tx.p','الوصف تحت العنوان','ta'),...L3('tx.school','اسم المدرسة في الأسفل','t'),...L3('tx.foot','سطر التذييل','t'),...stF]};
+S.settings={n:'الموقع',one:'الإعدادات',f:[['cover','صورة الغلاف (أول الصفحة الرئيسية)','img'],['social.instagram','رابط إنستغرام','t','ltr'],['social.tiktok','رابط تيك توك','t','ltr'],['social.facebook','رابط فيسبوك','t','ltr'],...L3('tx.h','العنوان الرئيسي','t'),...L3('tx.p','الوصف تحت العنوان','ta'),...L3('tx.school','اسم المدرسة في الأسفل','t'),...L3('tx.foot','سطر التذييل','t'),...stF]};
 const SEED=[['','','الرئيس الأول ومؤسس النادي','Founder and first president','Fondateur et premier président','2017 – 2022','p1'],['Hanachi Lina','Hanachi Lina','الرئيسة الثانية','Second president','Deuxième présidente','2022 – 2023','p2'],['Guettat Ishak','Guettat Ishak','الرئيس الثالث','Third president','Troisième président','2023 – 2025','p3'],['Cherif Ali','Cherif Ali','الرئيس الرابع','Fourth president','Quatrième président','2025','p4'],['Kamel Soltani','Kamel Soltani','الرئيس الخامس (الحالي)','Fifth and current president','Cinquième président (actuel)','2025 –','p5']];
 
 const MODELS=['gemini-3.1-flash-lite','gemini-3.5-flash','gemini-3-flash-preview'];
@@ -74,14 +74,24 @@ function aiView(){nav();
   form('posts',{id:uid(),type:'news',pub:false,created:Date.now(),title:r.title,body:r.body});toast('راجع المسودة ثم احفظ')});
  $('#a2').onclick=()=>run(async t=>{const r=await ai(`${CTX}\nToday in Algeria is ${today()}. Turn the user's notes into an event. Dates are Africa/Algiers local time. Leave a field empty if the user did not give it. Notes: ${t}\nReturn JSON exactly: {"title":{"ar":"","en":"","fr":""},"start":"YYYY-MM-DDTHH:MM","end":"YYYY-MM-DDTHH:MM","allDay":false,"place":"","desc":""}`);
   form('events',{id:uid(),title:r.title,start:iso(r.start),end:iso(r.end||''),allDay:!!r.allDay,place:r.place||'',desc:r.desc||'',pub:false,status:'auto',album:[],created:Date.now()});toast('راجع المسودة ثم احفظ')})}
-const back=c=>{if(c==='settings'){view='home';home()}else list(c)};
+let ret=null;
+const back=c=>{if(ret==='preview'){ret=null;view='preview';return go()}if(c==='settings'){view='home';home()}else list(c)};
+function previewView(){nav();m.innerHTML=`<p style="margin:0 0 8px">داخل المعاينة اضغط ✎ للتعديل أو 🗑 للحذف أو الأزرار الذهبية للإضافة، فيفتح النموذج هنا. المسودات لا تظهر في المعاينة.</p><iframe src="index.html?edit=1&_=${Date.now()}" style="width:100%;height:76vh;border:1.5px solid #0a3d2255;border-radius:14px;background:#fff"></iframe>`}
+addEventListener('message',async e=>{if(e.origin!==location.origin||!auth.currentUser)return;const d=e.data||{};
+ try{
+  if(d.a==='set'){ret='preview';return settingsView()}
+  if(!S[d.c]||d.c==='settings')return;
+  if(d.a==='add'){ret='preview';return form(d.c,{id:uid(),pub:true,status:'auto',album:[],created:Date.now()})}
+  if(d.a==='edit'){const s=await F.getDoc(F.doc(db,d.c,d.id));ret='preview';return form(d.c,{id:d.id,...s.data()})}
+  if(d.a==='del'&&confirm('حذف نهائي؟')){await rm(d.c,d.id);toast('تم الحذف');view='preview';go()}
+ }catch(x){alert(x.message)}});
 const stt=e=>e.status==='cancelled'?'ملغاة':e.status==='postponed'?'مؤجلة':Date.now()<new Date(e.start)?'قادمة':Date.now()<=new Date(e.end)?'جارية':'منتهية';
-const TABS=[['home','الرئيسية'],['posts','المنشورات'],['events','الفعاليات'],['ai','المساعد'],['people','الأشخاص'],['settings','الموقع'],['inbox','الوارد']];
+const TABS=[['home','الرئيسية'],['posts','المنشورات'],['events','الفعاليات'],['preview','معاينة وتعديل'],['ai','المساعد'],['people','الأشخاص'],['settings','الموقع'],['inbox','الوارد']];
 let view='home';
 function nav(badge){$('#nav').hidden=false;$('#nav').innerHTML=TABS.map(([k,n])=>`<button class="${k===view?'on':''}" data-v="${k}">${n}${k==='inbox'&&badge?` <span class="dot"></span>`:''}</button>`).join('')}
-$('#nav').onclick=e=>{if(e.target.dataset.v){view=e.target.dataset.v;go()}};
+$('#nav').onclick=e=>{if(e.target.dataset.v){ret=null;view=e.target.dataset.v;go()}};
 $('#out').onclick=()=>A.signOut(auth);
-const go=()=>view==='home'?home():view==='inbox'?inbox('messages'):view==='settings'?settingsView():view==='ai'?aiView():list(view);
+const go=()=>view==='home'?home():view==='inbox'?inbox('messages'):view==='settings'?settingsView():view==='ai'?aiView():view==='preview'?previewView():list(view);
 async function settingsView(){nav();const d=await F.getDoc(F.doc(db,'settings','site'));form('settings',{id:'site',...(d.exists()?d.data():{})})}
 
 A.onAuthStateChanged(auth,async u=>{
@@ -95,8 +105,8 @@ async function home(){
  nav(un(a)+un(b)+un(c));
  const up=ev.filter(e=>e.pub&&['قادمة','جارية'].includes(stt(e))).length,card=(n,l)=>`<div class="card"><div class="n">${n}</div>${l}</div>`;
  m.innerHTML=`<div class="grid">${card(un(b),'طلبات انضمام جديدة')+card(un(a),'رسائل جديدة')+card(un(c),'آراء جديدة')+card(up,'فعاليات قادمة')+card(po.filter(p=>p.pub).length,'منشورات منشورة')}</div>
- <div class="card"><b>ابدأ من هنا</b><div class="row" style="margin-top:8px"><button data-q="posts">منشور جديد</button><button data-q="events">فعالية جديدة</button></div></div>`;
- m.onclick=e=>{if(e.target.dataset.q)form(e.target.dataset.q,{id:uid(),pub:false,status:'auto',album:[],created:Date.now()})}}
+ <div class="card"><b>ابدأ من هنا</b><div class="row" style="margin-top:8px"><button data-q="posts">منشور جديد</button><button data-q="events">فعالية جديدة</button><button class="o" data-q="ai">مفتاح Gemini</button></div></div>`;
+ m.onclick=e=>{const q=e.target.dataset.q;if(q==='ai'){view='ai';aiView()}else if(q)form(q,{id:uid(),pub:false,status:'auto',album:[],created:Date.now()})}}
 
 async function list(c){
  nav();const d=(await col(c)).sort((a,b)=>c==='events'?(b.start||'').localeCompare(a.start||''):c==='people'?(+a.order||0)-(+b.order||0):(b.created||0)-(a.created||0));

@@ -63,6 +63,7 @@ footer{background:var(--g1);color:#cfe7d7;padding:34px 0;text-align:center;font-
 footer .soc{justify-content:center;margin:14px 0}footer .soc a,footer .soc span{border-color:#7be3a155}
 @media(prefers-reduced-motion:no-preference){.hero .badge-big{animation:rise 1.2s ease both}@keyframes rise{from{opacity:0;transform:translateY(18px)}}}
 .badge-big{width:150px;height:150px;border-radius:50%;background:#f3f0dd;display:grid;place-items:center;margin-bottom:18px}.badge-big img{width:124px}
+.card{position:relative}.ed{position:absolute;top:8px;inset-inline-end:8px;display:flex;gap:4px;z-index:2}.ed button,.tb button{min-width:38px;height:38px;border-radius:10px;border:0;background:var(--gold);color:#06210f;font:700 14px Cairo;cursor:pointer;padding:0 10px}.tb{display:flex;gap:8px;flex-wrap:wrap;padding:10px 18px;background:var(--bg2)}
 </style>
 </head>
 <body>
@@ -150,7 +151,7 @@ function countdown(){
 function home(){
  const tx=t(),e=nextEv(),yrs=new Date().getFullYear()-2017;
  return `<div class="hero"><div class="wrap"><div><div class="badge-big"><img src="logo.png" alt="AGRESA"></div><h1>${tx.h}</h1><p>${tx.p}</p>
- <a class="btn" href="#/join">${tx.join}</a><a class="btn alt" href="#/story">${tx.story}</a></div><div class="photo">${tx.ph}</div></div></div>
+ <a class="btn" href="#/join">${tx.join}</a><a class="btn alt" href="#/story">${tx.story}</a></div>${SITE.cover?`<img src="${esc(SITE.cover)}" alt="AGRESA" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:22px">`:`<div class="photo">${tx.ph}</div>`}</div></div>
  <section><div class="wrap"><div class="ev"><h2>${tx.next}</h2>${e?`<p>${esc(tt(e))}${e.demo?` <span class="tag">${tx.demo}</span>`:''}</p><p class="sub" style="margin:4px auto">${when(e)} · ${esc(pl(e))}</p>`:''}<div id="cd"></div>
  ${e?`<a class="btn" href="#/events">${tx.reg}</a><a class="btn alt" href="#/events">${tx.cal}</a>`:''}</div></div></section>
  <section><div class="wrap"><h2>${tx.news}</h2>${newsList()}</div></section>
@@ -175,7 +176,7 @@ function nextEv(){const l=SITE.events.filter(e=>vis(e)&&['upcoming','live'].incl
 const tt=e=>e.title[lang]||e.title.ar||'',pl=e=>typeof e.place==='string'?e.place:(e.place?.[lang]||'');
 const fz=d=>new Date(d).toISOString().replace(/[-:]|\.\d+/g,'');
 function evCard(e){const s=st(e),tx=t(),on=s==='upcoming'||s==='live';
- return `<div class="card">${e.poster?`<img src="${esc(e.poster)}" alt="${esc(tt(e))}" loading="lazy" style="width:100%;border-radius:12px;margin-bottom:10px">`:''}<span class="tag">${ST[lang][s]}</span><h3>${esc(tt(e))}</h3><p class="sub" style="margin:0">${when(e)}</p><p>${esc(pl(e))}${e.map?` <a href="${esc(e.map)}" target="_blank" rel="noopener">🗺</a>`:''}</p>${e.note?`<p><b>${esc(e.note)}</b></p>`:''}${e.desc?`<p>${esc(e.desc).replace(/\n/g,'<br>')}</p>`:''}${e.seats?`<p class="sub">${esc(e.seats)} ✦</p>`:''}${on&&e.reg?`<a class="btn" href="${esc(e.reg)}" target="_blank" rel="noopener">${tx.reg}</a> `:''}${s==='upcoming'?`<button class="btn alt" data-ics="${esc(e.id)}">${tx.cal} .ics</button> <a class="btn alt" target="_blank" rel="noopener" href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(tt(e))}&dates=${fz(e.start)}/${fz(e.end)}&location=${encodeURIComponent(pl(e))}">Google</a>`:''}${(e.album||[]).length?`<div class="grid" style="margin-top:10px">${e.album.map(a=>`<img src="${esc(a)}" alt="" loading="lazy" style="width:100%;border-radius:10px">`).join('')}</div>`:''}</div>`}
+ return `<div class="card">${ed('events',e.id)}${e.poster?`<img src="${esc(e.poster)}" alt="${esc(tt(e))}" loading="lazy" style="width:100%;border-radius:12px;margin-bottom:10px">`:''}<span class="tag">${ST[lang][s]}</span><h3>${esc(tt(e))}</h3><p class="sub" style="margin:0">${when(e)}</p><p>${esc(pl(e))}${e.map?` <a href="${esc(e.map)}" target="_blank" rel="noopener">🗺</a>`:''}</p>${e.note?`<p><b>${esc(e.note)}</b></p>`:''}${e.desc?`<p>${esc(e.desc).replace(/\n/g,'<br>')}</p>`:''}${e.seats?`<p class="sub">${esc(e.seats)} ✦</p>`:''}${on&&e.reg?`<a class="btn" href="${esc(e.reg)}" target="_blank" rel="noopener">${tx.reg}</a> `:''}${s==='upcoming'?`<button class="btn alt" data-ics="${esc(e.id)}">${tx.cal} .ics</button> <a class="btn alt" target="_blank" rel="noopener" href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(tt(e))}&dates=${fz(e.start)}/${fz(e.end)}&location=${encodeURIComponent(pl(e))}">Google</a>`:''}${(e.album||[]).length?`<div class="grid" style="margin-top:10px">${e.album.map(a=>`<img src="${esc(a)}" alt="" loading="lazy" style="width:100%;border-radius:10px">`).join('')}</div>`:''}</div>`}
 function evPage(){const l=SITE.events.filter(vis),up=l.filter(e=>st(e)!=='ended').sort((a,b)=>new Date(a.start)-new Date(b.start)),old=l.filter(e=>st(e)==='ended').sort((a,b)=>new Date(b.start)-new Date(a.start));
  return l.length?`<div class="grid">${up.concat(old).map(evCard).join('')}</div>`:`<div class="empty">${t().empty}</div>`}
 function galPage(){return SITE.gallery.length?`<div class="grid">${SITE.gallery.map(g=>`<figure class="card" style="padding:8px"><a href="${esc(g.img)}" target="_blank"><img src="${esc(g.img)}" alt="${esc(g.cap||'')}" loading="lazy" style="width:100%;border-radius:10px"></a>${g.cap?`<figcaption class="sub" style="margin:6px 0 0">${esc(g.cap)}</figcaption>`:''}</figure>`).join('')}</div>`:`<div class="empty">${t().empty}</div>`}
@@ -186,13 +187,15 @@ async function load(){try{const {CFG}=await import('./config.js');if(!CFG.fireba
  const V='https://www.gstatic.com/firebasejs/10.14.1/',[{initializeApp},F]=await Promise.all([import(V+'firebase-app.js'),import(V+'firebase-firestore.js')]),db=F.getFirestore(initializeApp(CFG.firebase));window.FB={db,F};
  const g=async(n,f)=>(await F.getDocs(F.query(F.collection(db,n),F.where(f,'==',true)))).docs.map(d=>({id:d.id,...d.data()}));
  const [ev,po,fb]=await Promise.all([g('events','pub'),g('posts','pub'),g('feedback','ok')]);
- SITE.events=ev;SITE.news=po.filter(vis).sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(b.created||0)-(a.created||0));SITE.fb=fb;SITE.people=await g('people','pub');const sd=await F.getDoc(F.doc(db,'settings','site'));if(sd.exists())applySet(sd.data())}catch(e){console.warn(e)}}
+ SITE.events=ev;SITE.news=po.filter(vis).sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(b.created||0)-(a.created||0));SITE.fb=fb;SITE.people=await g('people','pub').catch(()=>[]);try{const sd=await F.getDoc(F.doc(db,'settings','site'));if(sd.exists())applySet(sd.data())}catch(e){console.warn(e)}}catch(e){console.warn(e)}}
+const EDIT=new URLSearchParams(location.search).has('edit')&&parent!==window;
+const ed=(c,id)=>EDIT&&id?`<span class="ed"><button data-ed="${c}:${id}" aria-label="edit">✎</button><button data-del="${c}:${id}" aria-label="delete">🗑</button></span>`:'';
 const SENT={ar:'وصلتنا رسالتك، شكراً لك',en:'Received, thank you',fr:'Bien reçu, merci'};
 async function sendForm(ev,c){ev.preventDefault();const f=ev.target,d=Object.fromEntries(new FormData(f));if(d.hp)return;delete d.hp;
  if(!window.FB){alert('Not connected yet');return}
  if(d.rate)d.rate=+d.rate;
  try{await FB.F.addDoc(FB.F.collection(FB.db,c),{...d,read:false,at:FB.F.serverTimestamp(),...(c==='feedback'?{ok:false}:{})});f.reset();f.insertAdjacentHTML('beforeend',`<p class="tag">${SENT[lang]}</p>`)}catch(e){alert('Error')}}
-function newsCard(x){return `<div class="card">${x.img?`<img src="${esc(x.img)}" alt="" loading="lazy" style="width:100%;border-radius:12px;margin-bottom:10px">`:''}${x.pinned?`<span class="tag">📌</span> `:''}<h3>${esc(x.title?.[lang]||x.title?.ar)}</h3><p>${esc(x.body?.[lang]||x.body?.ar).replace(/\n/g,'<br>')}</p></div>`}
+function newsCard(x){return `<div class="card">${ed('posts',x.id)}${x.img?`<img src="${esc(x.img)}" alt="" loading="lazy" style="width:100%;border-radius:12px;margin-bottom:10px">`:''}${x.pinned?`<span class="tag">📌</span> `:''}<h3>${esc(x.title?.[lang]||x.title?.ar)}</h3><p>${esc(x.body?.[lang]||x.body?.ar).replace(/\n/g,'<br>')}</p></div>`}
 const newsList=()=>SITE.news.length?`<div class="grid">${SITE.news.map(newsCard).join('')}</div>`:`<div class="empty">${t().nonews}</div>`;
 const fbList=()=>(SITE.fb||[]).length?`<div class="grid" style="margin-top:18px">${SITE.fb.map(x=>`<div class="card"><b>${esc(x.name)}</b> <span class="tag">${'★'.repeat(x.rate||5)}</span><p>${esc(x.msg)}</p></div>`).join('')}</div>`:'';
 const FM={ar:['الاسم','البريد الإلكتروني','رسالتك','إرسال','رأيك في الموقع','التقييم'],en:['Name','Email','Your message','Send','Your opinion of the site','Rating'],fr:['Nom','E-mail','Votre message','Envoyer','Votre avis sur le site','Note']};
@@ -208,17 +211,19 @@ const PRES=[
 function peoplePage(gs){const now={ar:'الآن',en:'present',fr:'aujourd’hui'}[lang];
  let l=SITE.people.filter(p=>gs.includes(p.group)).sort((a,b)=>(+a.order||0)-(+b.order||0));
  if(!l.length&&gs.includes('founder')&&!SITE.people.length)l=PRES.map(p=>({title:{ar:p.n,en:p.n,fr:p.n},role:{ar:p.r[0],en:p.r[1],fr:p.r[2]},years:p.y,img:''+p.i+'.webp'}));
- return l.length?`<div class="grid">${l.map(p=>{const nm=p.title?.[lang]||p.title?.ar||'',rl=p.role?.[lang]||p.role?.ar||'';return `<div class="card">${p.img?`<img src="${esc(p.img)}" alt="${esc(nm||rl)}" loading="lazy" style="width:100%;aspect-ratio:4/5;object-fit:cover;object-position:top;border-radius:12px;margin-bottom:10px">`:''}${p.years?`<span class="tag">${esc(p.years).replace('⟶',now)}</span>`:''}<h3>${esc(nm||rl)}</h3>${nm?`<p class="sub" style="margin:0">${esc(rl)}</p>`:''}</div>`}).join('')}</div>`:`<div class="empty">${t().empty}</div>`}
-function applySet(d){for(const k in d.social||{})if(d.social[k])SITE.social[k]=d.social[k];
+ return l.length?`<div class="grid">${l.map(p=>{const nm=p.title?.[lang]||p.title?.ar||'',rl=p.role?.[lang]||p.role?.ar||'';return `<div class="card">${ed('people',p.id)}${p.img?`<img src="${esc(p.img)}" alt="${esc(nm||rl)}" loading="lazy" style="width:100%;aspect-ratio:4/5;object-fit:cover;object-position:top;border-radius:12px;margin-bottom:10px">`:''}${p.years?`<span class="tag">${esc(p.years).replace('⟶',now)}</span>`:''}<h3>${esc(nm||rl)}</h3>${nm?`<p class="sub" style="margin:0">${esc(rl)}</p>`:''}</div>`}).join('')}</div>`:`<div class="empty">${t().empty}</div>`}
+function applySet(d){if(d.cover)SITE.cover=d.cover;for(const k in d.social||{})if(d.social[k])SITE.social[k]=d.social[k];
  for(const l of ['ar','en','fr']){for(const k of ['h','p','school','foot'])if(d.tx?.[k]?.[l])T[l][k]=d.tx[k][l];
   [1,2,3].forEach(n=>{const ti=d['st'+n+'t'],b=d['st'+n+'b'];if(ti?.[l]||ti?.ar)T[l].tl[n-1]=[d['st'+n+'y']||T[l].tl[n-1][0],ti[l]||ti.ar,b?.[l]||b?.ar||'']})}}
 function render(){
  const k=location.hash.replace('#/','');
  $('#app').innerHTML=k===''?home():(ROUTES.includes(k)?page(k):home());
+ if(EDIT)$('#app').insertAdjacentHTML('afterbegin','<div class="tb"><button data-set="1">✎ النصوص والغلاف والقصة</button><button data-add="posts">+ منشور</button><button data-add="events">+ فعالية</button><button data-add="people">+ شخص</button></div>');
  chrome();countdown();scrollTo(0,0);
 }
 document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
  if(b.dataset.l){lang=b.dataset.l;localStorage.lang=lang;render()}
+ if(EDIT){const d=b.dataset;if(d.ed||d.del||d.add||d.set){const v=d.ed||d.del||d.add||'';parent.postMessage({a:d.ed?'edit':d.del?'del':d.add?'add':'set',c:v.split(':')[0],id:v.split(':')[1]},location.origin);return}}
  if(b.dataset.ics)icsDl(b.dataset.ics);if(b.id==='th'){theme=theme==='dark'?'light':'dark';localStorage.theme=theme;chrome()}});
 addEventListener('hashchange',render);load().then(render);
 </script>
