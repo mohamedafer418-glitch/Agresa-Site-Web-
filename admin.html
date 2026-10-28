@@ -19,6 +19,7 @@ label{display:block;font-weight:700;margin-bottom:3px}label.c{display:flex;gap:1
 .n{font:800 34px Cairo;color:var(--g2);line-height:1}.tag{background:var(--gold);border-radius:99px;padding:1px 10px;font-size:13px;font-weight:700}
 .dot{width:10px;height:10px;border-radius:50%;background:#b3261e;display:inline-block}
 img.th{height:74px;border-radius:10px;margin:0 0 8px 8px}
+img.th[data-rm]{cursor:pointer}.gone{opacity:.25;outline:3px solid #b3261e}
 #toast{position:fixed;bottom:14px;inset-inline:14px;background:#06210f;color:#fff;padding:14px;border-radius:12px;text-align:center;display:none;z-index:9}
 </style></head><body>
 <header><b>لوحة إدارة أڨريسا</b><a href="index.html" target="_blank" style="color:#7be3a1;font-size:14px">فتح الموقع</a><small id="me"></small><button class="o s" id="out" hidden style="color:#fff;border-color:#fff">خروج</button></header>
@@ -48,8 +49,8 @@ async function up(f){if(f.type&&!f.type.startsWith('image/'))throw Error('ملف
 
 const L3=(k,l,t)=>[['.ar',' بالعربية'],['.en',' بالإنجليزية'],['.fr',' بالفرنسية']].map(([s,n])=>[k+s,l+n,t,s==='.ar'?'':'ltr']);
 const S={
- posts:{n:'المنشورات',one:'منشور',f:[...L3('title','العنوان','t'),...L3('body','النص','ta'),['img','الصورة','img'],['type','النوع','sel',[['news','خبر'],['announce','إعلان'],['update','تحديث فعالية']]],['pinned','تثبيت في الأعلى','cb'],['publishAt','وقت الظهور (فارغ = الآن)','dt'],['pub','منشور للزوار','cb']]},
- events:{n:'الفعاليات',one:'فعالية',f:[...L3('title','العنوان','t'),['poster','الملصق','img'],['start','البداية','dt'],['end','النهاية','dt'],['allDay','فعالية ليوم كامل','cb'],['place','المكان','t'],['map','رابط الخريطة','t','ltr'],['desc','الوصف','ta'],['reg','رابط التسجيل','t','ltr'],['seats','عدد المقاعد','t'],['status','الحالة','sel',[['auto','تلقائية من التاريخ'],['postponed','مؤجلة'],['cancelled','ملغاة']]],['note','سطر توضيحي للزوار','t'],['publishAt','وقت الظهور (فارغ = الآن)','dt'],['album','صور الألبوم','imgs'],['pub','منشورة للزوار','cb']]}
+ posts:{n:'المنشورات',one:'منشور',f:[...L3('title','العنوان','t'),...L3('body','النص','ta'),['img','الصورة','img'],['album','صور المنشور (اختر عدة صور معاً لتُنشر مع المنشور)','imgs'],['type','النوع','sel',[['news','خبر'],['announce','إعلان'],['update','تحديث فعالية']]],['pinned','تثبيت في الأعلى','cb'],['publishAt','وقت الظهور (فارغ = الآن)','dt'],['pub','منشور للزوار','cb']]},
+ events:{n:'الفعاليات',one:'فعالية',f:[...L3('title','العنوان','t'),['poster','الملصق','img'],['start','البداية','dt'],['end','النهاية','dt'],['allDay','فعالية ليوم كامل','cb'],['dateText','نص التاريخ بدل الموعد (اختياري، مثل: 2022)','t'],['place','المكان','t'],['map','رابط الخريطة','t','ltr'],['desc','الوصف','ta'],['reg','رابط التسجيل','t','ltr'],['seats','عدد المقاعد','t'],['status','الحالة','sel',[['auto','تلقائية من التاريخ'],['postponed','مؤجلة'],['cancelled','ملغاة']]],['note','سطر توضيحي للزوار','t'],['publishAt','وقت الظهور (فارغ = الآن)','dt'],['album','صور الألبوم (اختر عدة صور معاً، واضغط على صورة قديمة لحذفها)','imgs'],['pub','منشورة للزوار','cb']]}
 };
 S.people={n:'الأشخاص',one:'شخص',f:[...L3('title','الاسم','t'),...L3('role','الصفة','t'),['years','السنوات (مثل 2017 – 2022)','t'],['img','الصورة','img'],['group','المجموعة','sel',[['founder','مؤسس أو رئيس'],['member','عضو'],['board','الهيئة الإدارية']]],['order','الترتيب (رقم)','t'],['pub','موافق على النشر وإظهاره في الموقع','cb']]};
 const stF=[];for(const n of [1,2,3])stF.push(['st'+n+'y','سنة أو عنوان صغير للمحطة '+n,'t'],...L3('st'+n+'t','عنوان المحطة '+n,'t'),...L3('st'+n+'b','نص المحطة '+n,'ta'));
@@ -114,10 +115,12 @@ async function home(){
 
 async function list(c){
  nav();const d=(await col(c)).sort((a,b)=>c==='events'?(b.start||'').localeCompare(a.start||''):c==='people'?(+a.order||0)-(+b.order||0):(b.created||0)-(a.created||0));
- m.innerHTML=`<button id="add">${S[c].one} جديد${c==='events'?'ة':''}</button> ${c==='people'&&!d.length?'<button class="o" id="seed">استيراد الرؤساء الخمسة</button>':''}<div style="height:12px"></div>`+(d.map(o=>`<div class="card"><div class="row">${c==='events'?`<span class="tag">${stt(o)}</span>`:o.pinned?'<span class="tag">مثبّت</span>':''}<span class="tag" style="background:${o.pub?'#7be3a1':'#ddd'}">${o.pub?'منشور':'مسودة'}</span></div><h3 style="margin:6px 0">${esc(o.title?.ar||o.role?.ar||'بلا عنوان')}</h3>${o.years?`<div>${esc(o.years)}</div>`:''}${o.start?`<div>${esc(o.start.replace('T',' ').slice(0,16))}</div>`:''}<div class="row" style="margin-top:8px"><button class="s" data-e="${o.id}">تعديل</button><button class="s o" data-c="${o.id}">تكرار</button><button class="s r" data-d="${o.id}">حذف</button></div></div>`).join('')||'<div class="card">لا شيء بعد.</div>');
+ m.innerHTML=`<button id="add">${S[c].one} جديد${c==='events'?'ة':''}</button> ${c==='events'&&!d.some(x=>x.id==='startup2022')?'<button class="o" id="seed2">استيراد فعالية تحدي 2022 بصورها</button>':''} ${c==='people'&&!d.length?'<button class="o" id="seed">استيراد الرؤساء الخمسة</button>':''}<div style="height:12px"></div>`+(d.map(o=>`<div class="card"><div class="row">${c==='events'?`<span class="tag">${stt(o)}</span>`:o.pinned?'<span class="tag">مثبّت</span>':''}<span class="tag" style="background:${o.pub?'#7be3a1':'#ddd'}">${o.pub?'منشور':'مسودة'}</span></div><h3 style="margin:6px 0">${esc(o.title?.ar||o.role?.ar||'بلا عنوان')}</h3>${o.years?`<div>${esc(o.years)}</div>`:''}${o.start?`<div>${esc(o.start.replace('T',' ').slice(0,16))}</div>`:''}<div class="row" style="margin-top:8px"><button class="s" data-e="${o.id}">تعديل</button><button class="s o" data-c="${o.id}">تكرار</button>${c==='events'&&(o.album||[]).length?`<button class="s o" data-pp="${o.id}">نشر الصور كمنشور</button>`:''}<button class="s r" data-d="${o.id}">حذف</button></div></div>`).join('')||'<div class="card">لا شيء بعد.</div>');
  $('#add').onclick=()=>form(c,{id:uid(),pub:false,status:'auto',album:[],created:Date.now()});
+ if($('#seed2'))$('#seed2').onclick=async()=>{await put('events',{id:'startup2022',title:{ar:'تحدي الشركات الناشئة لتكنولوجيا الغذاء 2022',en:'Food Tech Startup Challenge 2022',fr:'Défi des startups Food Tech 2022'},start:'2022-01-01T09:00:00+01:00',end:'2022-01-01T17:00:00+01:00',dateText:'2022',place:'',desc:'كانت أڨريسا حاضرة في تحدي الشركات الناشئة لتكنولوجيا الغذاء عام 2022، بحضور وزير الفلاحة.\nAGRESA was part of the Food Tech Startup Challenge 2022, with the Minister of Agriculture in attendance.\nAGRESA a pris part au Défi des startups Food Tech 2022, en présence du ministre de l’Agriculture.',poster:'st-poster.webp',album:['st1','st2','st3','st4','st5','st6','st7','st8'].map(x=>''+x+'.webp'),pub:true,status:'auto',created:Date.now()});toast('تم الاستيراد');list('events')};
  if($('#seed'))$('#seed').onclick=async()=>{for(const [i,s] of SEED.entries())await put('people',{id:uid(),title:{ar:s[0],en:s[1],fr:s[1]},role:{ar:s[2],en:s[3],fr:s[4]},years:s[5],img:''+s[6]+'.webp',group:'founder',order:String(i+1),pub:true,created:Date.now()});toast('تم الاستيراد');list('people')};
- m.onclick=async e=>{const t=e.target.dataset,o=d.find(x=>x.id===(t.e||t.c||t.d));
+ m.onclick=async e=>{const t=e.target.dataset,o=d.find(x=>x.id===(t.e||t.c||t.d||t.pp));
+  if(t.pp)form('posts',{id:uid(),type:'update',pub:false,created:Date.now(),title:o.title||{},img:o.poster||'',album:[...(o.album||[])]});
   if(t.e)form(c,o);if(t.c)form(c,{...structuredClone(o),id:uid(),pub:false,created:Date.now(),start:'',end:'',album:[],publishAt:'',note:''});
   if(t.d&&confirm('حذف نهائي؟')){await rm(c,t.d);toast('تم الحذف');list(c)}}}
 
@@ -131,9 +134,10 @@ function form(c,o){
   if(t==='dt')h+=`<input type="datetime-local" id="${i}" value="${loc(v)}">`;
   if(t==='sel')h+=`<select id="${i}">${opt.map(([a,b])=>`<option value="${a}" ${(v||opt[0][0])===a?'selected':''}>${b}</option>`).join('')}</select>`;
   if(t==='img')h+=`${v?`<img class="th" src="${esc(v)}">`:''}<input type="file" id="${i}" accept="image/*">`;
-  if(t==='imgs')h+=`${(v||[]).map(u=>`<img class="th" src="${esc(u)}">`).join('')}<input type="file" id="${i}" accept="image/*" multiple>`;
+  if(t==='imgs')h+=`${(v||[]).map(u=>`<img class="th" data-rm="${esc(u)}" src="${esc(u)}">`).join('')}<input type="file" id="${i}" accept="image/*" multiple>`;
   return h};
  m.innerHTML=`<div class="card">${fs.map(f=>inp([f[0],f[1],f[2],f[3],f[3]])).join('').replace(/<label>/g,'<label>')}${fs.some(f=>f[0].endsWith('.ar'))?'<button class="o" id="tr" style="margin-bottom:12px">ترجم من العربية بـ Gemini</button>':''}<div class="row"><button id="ok">حفظ</button><button class="o" id="bk">رجوع</button></div></div>`;
+ m.querySelectorAll('img[data-rm]').forEach(i=>i.onclick=()=>i.classList.toggle('gone'));
  $('#bk').onclick=()=>back(c);
  if($('#tr'))$('#tr').onclick=async()=>{const src={};for(const f of fs)if(f[0].endsWith('.ar')&&(f[2]==='t'||f[2]==='ta')){const v=$('#'+id(f[0])).value.trim();if(v)src[f[0].slice(0,-3)]=v}
   if(!Object.keys(src).length)return alert('اكتب النص بالعربية أولاً');
@@ -142,11 +146,11 @@ function form(c,o){
  $('#ok').onclick=async()=>{
   const n={...o},V=[];
   for(const [k,,t] of fs){const e=$('#'+id(k));if(!e){alert('حقل مفقود: '+k);return}
-   V.push([k,t,t==='cb'?e.checked:t==='img'?e.files[0]:t==='imgs'?[...e.files]:t==='dt'?iso(e.value):e.value.trim()])}
-  if(V.some(([,t,v])=>(t==='img'&&v)||(t==='imgs'&&v.length)))toast('جارٍ رفع الصور، انتظر...');
+   V.push([k,t,t==='cb'?e.checked:t==='img'?e.files[0]:t==='imgs'?{keep:[...(o[k]||[])].filter(u=>![...document.querySelectorAll('img.gone')].some(i=>i.dataset.rm===u)),files:[...e.files]}:t==='dt'?iso(e.value):e.value.trim()])}
+  if(V.some(([,t,v])=>(t==='img'&&v)||(t==='imgs'&&v.files.length)))toast('جارٍ رفع الصور، انتظر...');
   try{for(const [k,t,v] of V){
    if(t==='img'){if(v)set(n,k,await up(v))}
-   else if(t==='imgs'){const a=[...(o[k]||[])];for(const x of v)a.push(await up(x));set(n,k,a)}
+   else if(t==='imgs'){const a=[...v.keep];for(const x of v.files)a.push(await up(x));set(n,k,a)}
    else set(n,k,v)}}catch(x){return alert(x.message)}
   if(c!=='settings'&&!(n.title?.ar||n.role?.ar))return alert('اكتب العنوان بالعربية');
   if(c==='events'){if(!n.start)return alert('حدد وقت البداية');if(n.allDay)n.end=n.start.slice(0,10)+'T23:59:00+01:00';if(!n.end||new Date(n.end)<new Date(n.start))return alert('وقت النهاية قبل وقت البداية. صحّحه ثم احفظ.')}
