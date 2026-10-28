@@ -76,6 +76,8 @@ function aiView(){nav();
  $('#a2').onclick=()=>run(async t=>{const r=await ai(`${CTX}\nToday in Algeria is ${today()}. Turn the user's notes into an event. Dates are Africa/Algiers local time. Leave a field empty if the user did not give it. Notes: ${t}\nReturn JSON exactly: {"title":{"ar":"","en":"","fr":""},"start":"YYYY-MM-DDTHH:MM","end":"YYYY-MM-DDTHH:MM","allDay":false,"place":"","desc":""}`);
   form('events',{id:uid(),title:r.title,start:iso(r.start),end:iso(r.end||''),allDay:!!r.allDay,place:r.place||'',desc:r.desc||'',pub:false,status:'auto',album:[],created:Date.now()});toast('راجع المسودة ثم احفظ')})}
 let ret=null;
+async function exportAll(){toast('جارٍ التجهيز...');const o={};for(const c of ['posts','events','people','settings','messages','joins','feedback'])o[c]=await col(c);
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(o,null,1)],{type:'application/json'}));a.download='agresa-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click()}
 const back=c=>{if(ret==='preview'){ret=null;view='preview';return go()}if(c==='settings'){view='home';home()}else list(c)};
 function previewView(){nav();m.innerHTML=`<p style="margin:0 0 8px">داخل المعاينة اضغط ✎ للتعديل أو 🗑 للحذف أو الأزرار الذهبية للإضافة، فيفتح النموذج هنا. المسودات لا تظهر في المعاينة.</p><iframe src="index.html?edit=1&_=${Date.now()}" style="width:100%;height:76vh;border:1.5px solid #0a3d2255;border-radius:14px;background:#fff"></iframe>`}
 addEventListener('message',async e=>{if(e.origin!==location.origin||!auth.currentUser)return;const d=e.data||{};
@@ -107,8 +109,8 @@ async function home(){
  nav(un(a)+un(b)+un(c));
  const up=ev.filter(e=>e.pub&&['قادمة','جارية'].includes(stt(e))).length,card=(n,l)=>`<div class="card"><div class="n">${n}</div>${l}</div>`;
  m.innerHTML=`<div class="grid">${card(un(b),'طلبات انضمام جديدة')+card(un(a),'رسائل جديدة')+card(un(c),'آراء جديدة')+card(up,'فعاليات قادمة')+card(po.filter(p=>p.pub).length,'منشورات منشورة')}</div>
- <div class="card"><b>ابدأ من هنا</b><div class="row" style="margin-top:8px"><button data-q="posts">منشور جديد</button><button data-q="events">فعالية جديدة</button><button class="o" data-q="ai">مفتاح Gemini</button></div></div>`;
- m.onclick=e=>{const q=e.target.dataset.q;if(q==='ai'){view='ai';aiView()}else if(q)form(q,{id:uid(),pub:false,status:'auto',album:[],created:Date.now()})}}
+ <div class="card"><b>ابدأ من هنا</b><div class="row" style="margin-top:8px"><button data-q="posts">منشور جديد</button><button data-q="events">فعالية جديدة</button><button class="o" data-q="ai">مفتاح Gemini</button><button class="o" data-q="bk">نسخة احتياطية</button></div></div>`;
+ m.onclick=e=>{const q=e.target.dataset.q;if(q==='bk')exportAll();else if(q==='ai'){view='ai';aiView()}else if(q)form(q,{id:uid(),pub:false,status:'auto',album:[],created:Date.now()})}}
 
 async function list(c){
  nav();const d=(await col(c)).sort((a,b)=>c==='events'?(b.start||'').localeCompare(a.start||''):c==='people'?(+a.order||0)-(+b.order||0):(b.created||0)-(a.created||0));
