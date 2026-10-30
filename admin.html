@@ -54,7 +54,7 @@ const S={
 };
 S.people={n:'الأشخاص',one:'شخص',f:[...L3('title','الاسم','t'),...L3('role','الصفة','t'),['years','السنوات (مثل 2017 – 2022)','t'],['img','الصورة','img'],['group','المجموعة','sel',[['founder','مؤسس أو رئيس'],['member','عضو'],['board','الهيئة الإدارية']]],['order','الترتيب (رقم)','t'],['pub','موافق على النشر وإظهاره في الموقع','cb']]};
 const stF=[];for(const n of [1,2,3])stF.push(['st'+n+'y','سنة أو عنوان صغير للمحطة '+n,'t'],...L3('st'+n+'t','عنوان المحطة '+n,'t'),...L3('st'+n+'b','نص المحطة '+n,'ta'));
-S.settings={n:'الموقع',one:'الإعدادات',f:[['cover','صورة الغلاف (أول الصفحة الرئيسية)','img'],['email','البريد الإلكتروني للنادي','t','ltr'],['social.instagram','رابط إنستغرام','t','ltr'],['social.tiktok','رابط تيك توك','t','ltr'],['social.facebook','رابط فيسبوك','t','ltr'],...L3('tx.h','العنوان الرئيسي','t'),...L3('tx.p','الوصف تحت العنوان','ta'),...L3('tx.school','اسم المدرسة في الأسفل','t'),...L3('tx.foot','سطر التذييل','t'),...stF]};
+S.settings={n:'الموقع',one:'الإعدادات',f:[['joinOpen','باب الانضمام مفتوح (يظهر زر ونموذج الانضمام للزوار)','cb'],['cover','صورة الغلاف (أول الصفحة الرئيسية)','img'],['email','البريد الإلكتروني للنادي','t','ltr'],['social.instagram','رابط إنستغرام','t','ltr'],['social.tiktok','رابط تيك توك','t','ltr'],['social.facebook','رابط فيسبوك','t','ltr'],...L3('tx.h','العنوان الرئيسي','t'),...L3('tx.p','الوصف تحت العنوان','ta'),...L3('tx.school','اسم المدرسة في الأسفل','t'),...L3('tx.foot','سطر التذييل','t'),...stF]};
 const SEED=[['','','الرئيس الأول ومؤسس النادي','Founder and first president','Fondateur et premier président','2017 – 2022','p1'],['Hanachi Lina','Hanachi Lina','الرئيسة الثانية','Second president','Deuxième présidente','2022 – 2023','p2'],['Guettat Ishak','Guettat Ishak','الرئيس الثالث','Third president','Troisième président','2023 – 2025','p3'],['Cherif Ali','Cherif Ali','الرئيس الرابع','Fourth president','Quatrième président','2025','p4'],['Kamel Soltani','Kamel Soltani','الرئيس الخامس (الحالي)','Fifth and current president','Cinquième président (actuel)','2025 –','p5']];
 
 const MODELS=['gemini-3.1-flash-lite','gemini-3.5-flash','gemini-3-flash-preview'];
@@ -108,10 +108,12 @@ A.onAuthStateChanged(auth,async u=>{const key=u?u.uid:'';if(key===cur)return;cur
 async function home(){
  const [a,b,c,ev,po]=await Promise.all(['messages','joins','feedback','events','posts'].map(col)),un=x=>x.filter(i=>!i.read).length;
  nav(un(a)+un(b)+un(c));
+ const sd=await F.getDoc(F.doc(db,'settings','site')),jo=!!(sd.exists()&&sd.data().joinOpen);
  const up=ev.filter(e=>e.pub&&['قادمة','جارية'].includes(stt(e))).length,card=(n,l)=>`<div class="card"><div class="n">${n}</div>${l}</div>`;
  m.innerHTML=`<div class="grid">${card(un(b),'طلبات انضمام جديدة')+card(un(a),'رسائل جديدة')+card(un(c),'آراء جديدة')+card(up,'فعاليات قادمة')+card(po.filter(p=>p.pub).length,'منشورات منشورة')}</div>
+ <div class="card"><b>باب الانضمام: ${jo?'مفتوح':'مغلق'}</b><p style="margin:4px 0 10px">${jo?'يظهر الآن زر «انضم إلينا» ونموذجه للزوار.':'يظهر للزوار أن الانضمام مغلق حالياً.'}</p><button class="${jo?'r':''}" data-q="join">${jo?'إغلاق باب الانضمام':'فتح باب الانضمام'}</button></div>
  <div class="card"><b>ابدأ من هنا</b><div class="row" style="margin-top:8px"><button data-q="posts">منشور جديد</button><button data-q="events">فعالية جديدة</button><button class="o" data-q="ai">مفتاح Gemini</button><button class="o" data-q="bk">نسخة احتياطية</button></div></div>`;
- m.onclick=e=>{const q=e.target.dataset.q;if(q==='bk')exportAll();else if(q==='ai'){view='ai';aiView()}else if(q)form(q,{id:uid(),pub:false,status:'auto',album:[],created:Date.now()})}}
+ m.onclick=async e=>{const q=e.target.dataset.q;if(q==='join'){await F.setDoc(F.doc(db,'settings','site'),{joinOpen:!jo},{merge:true});toast(jo?'أُغلق باب الانضمام':'فُتح باب الانضمام');home()}else if(q==='bk')exportAll();else if(q==='ai'){view='ai';aiView()}else if(q)form(q,{id:uid(),pub:false,status:'auto',album:[],created:Date.now()})}}
 
 async function list(c){
  nav();const d=(await col(c)).sort((a,b)=>c==='events'?(b.start||'').localeCompare(a.start||''):c==='people'?(+a.order||0)-(+b.order||0):(b.created||0)-(a.created||0));
