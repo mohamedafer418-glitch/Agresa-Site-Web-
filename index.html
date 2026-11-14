@@ -159,7 +159,7 @@ function home(){
  ${e?`<a class="btn" href="#/events">${tx.reg}</a><a class="btn alt" href="#/events">${tx.cal}</a>`:''}</div></div></section>
  ${recent()}
  <section><div class="wrap"><h2>${tx.news}</h2>${newsList(3)}${SITE.news.length>3?`<p><a class="btn alt" style="color:inherit" href="#/news">${ALL[lang]}</a></p>`:''}</div></section>
- <section><div class="wrap stats"><div><b>${yrs}</b>${tx.stats[0]}</div><div><b>${SITE.events.length}</b>${tx.stats[1]}</div><div><b>${SITE.members.length}</b>${tx.stats[2]}</div></div></section>
+ <section><div class="wrap stats"><div><b>${yrs}</b>${tx.stats[0]}</div><div><b>∞</b>${tx.stats[1]}</div><div><b>${SITE.members.length}</b>${tx.stats[2]}</div></div></section>
  <section><div class="wrap"><h2>${FOL[lang][0]}</h2><p class="sub">${FOL[lang][1]}</p><div class="soc">${soc()}</div><img src="hashtag.jpg" alt="#We_are_green" loading="lazy" style="width:100%;max-width:360px;border-radius:18px;margin-top:18px"></div></section>`;
 }
 function list(a,msg){return a.length?`<div class="grid">${a.map(x=>`<div class="card"><h3>${x.title?.[lang]||''}</h3></div>`).join('')}</div>`:`<div class="empty">${msg||t().empty}</div>`}
