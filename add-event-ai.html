@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>مساعد إضافة الفعاليات</title>
+<style>
+[hidden]{display:none!important}*{box-sizing:border-box}body{margin:0;font:16px/1.7 Cairo,Tahoma,sans-serif;background:#f3f0dd;color:#06210f}
+header{background:#0a3d22;color:#f3f0dd;padding:12px 16px;display:flex;gap:12px;align-items:center}header b{flex:1}header a{color:#7be3a1}
+main{max-width:760px;margin:auto;padding:16px}.card{background:#fffdf0;border:1px solid #0a3d2230;border-radius:16px;padding:14px;margin-bottom:12px}
+button{font:inherit;font-weight:700;min-height:48px;padding:0 20px;border:0;border-radius:12px;background:#1fb05a;color:#fff;cursor:pointer}button.o{background:transparent;color:#0a3d22;border:1.5px solid #0a3d22}
+input,textarea{font:inherit;width:100%;min-height:46px;padding:9px 12px;border-radius:12px;border:1.5px solid #0a3d2255;background:#fff;margin-bottom:10px}label{display:block;font-weight:700;margin-bottom:3px}
+label.c{display:flex;gap:10px;align-items:center}label.c input{width:22px;min-height:22px;margin:0}
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin:10px 0}
+.th{position:relative;border-radius:10px;overflow:hidden;border:3px solid transparent;cursor:pointer}.th img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
+.th span{position:absolute;inset-inline:0;bottom:0;background:#000b;color:#fff;font-size:12px;text-align:center;padding:2px}
+.th.poster{border-color:#e6c36a}.th.skip{opacity:.35;border-color:#b3261e}
+#toast{position:fixed;bottom:14px;inset-inline:14px;background:#06210f;color:#fff;padding:14px;border-radius:12px;text-align:center;display:none;z-index:9}
+</style></head><body>
+<header><b>مساعد إضافة الفعاليات</b><a href="admin.html">لوحة الإدارة</a></header>
+<main>
+<div class="card" id="auth" hidden><p>سجّل الدخول بحساب الأدمن.</p><button id="in">الدخول بـ Google</button></div>
+<div id="app" hidden>
+ <div class="card"><label>اكتب ما تعرفه عن الفعالية</label><textarea id="notes" rows="6" placeholder="العنوان، التاريخ، المكان، ما جرى فيها، من نظّمها..."></textarea>
+ <label>اختر صور الفعالية (عدة صور معاً)</label><input type="file" id="files" accept="image/*" multiple>
+ <div id="grid"></div><p style="margin:0 0 10px;font-size:14px">اضغط على أي صورة لتغيير دورها: ألبوم ثم ملصق ثم مستبعدة.</p>
+ <button id="an">حلّل وجهّز الفعالية بـ Gemini</button></div>
+ <div class="card"><label>مفتاح Gemini (يُحفظ في هذا المتصفح فقط)</label><input id="gk" type="password" dir="ltr" placeholder="مشترك مع لوحة الإدارة إن حفظته هناك"><button class="o" id="gs">حفظ المفتاح</button></div>
+ <div class="card" id="rev" hidden><h3 style="margin-top:0">راجع وعدّل قبل الحفظ</h3>
+  <label>العنوان بالعربية</label><input id="t_ar"><label>العنوان بالإنجليزية</label><input id="t_en" dir="ltr"><label>العنوان بالفرنسية</label><input id="t_fr" dir="ltr">
+  <label>التاريخ</label><input type="date" id="dt"><label>المكان</label><input id="pl">
+  <label>الوصف بالعربية</label><textarea id="d_ar" rows="4"></textarea><label>الوصف بالإنجليزية</label><textarea id="d_en" rows="4" dir="ltr"></textarea><label>الوصف بالفرنسية</label><textarea id="d_fr" rows="4" dir="ltr"></textarea>
+  <label>سطر الحقوق (مثل: تصوير ...)</label><input id="cr">
+  <label class="c"><input type="checkbox" id="pub">انشرها للزوار الآن (وإلا تُحفظ مسودة تجدها في تبويب الفعاليات)</label>
+  <button id="pb">ارفع الصور واحفظ الفعالية</button></div>
+</div>
+</main><div id="toast"></div>
+<script type="module">
+import {CFG} from './config.js';
+const $=s=>document.querySelector(s);
+const toast=t=>{const e=$('#toast');e.textContent=t;e.style.display='block';setTimeout(()=>e.style.display='none',3500)};
+const V='https://www.gstatic.com/firebasejs/10.14.1/';
+const {initializeApp}=await import(V+'firebase-app.js'),A=await import(V+'firebase-auth.js'),F=await import(V+'firebase-firestore.js');
+const app=initializeApp(CFG.firebase),auth=A.getAuth(app),db=F.getFirestore(app);
+const MODELS=['gemini-3.1-flash-lite','gemini-3.5-flash','gemini-3-flash-preview'];
+let imgs=[];
+const dec=async f=>{try{return await createImageBitmap(f)}catch(e){const i=new Image();i.src=URL.createObjectURL(f);await i.decode();return i}};
+async function shrink(f,px,type,q){const b=await dec(f),W=b.width||b.naturalWidth,H=b.height||b.naturalHeight,s=Math.min(1,px/Math.max(W,H)),c=document.createElement('canvas');c.width=W*s|0;c.height=H*s|0;c.getContext('2d').drawImage(b,0,0,c.width,c.height);return new Promise(r=>c.toBlob(r,type,q))}
+const b64=b=>new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result.split(',')[1]);x.readAsDataURL(b)});
+async function gem(parts){const k=localStorage.gk;if(!k)throw Error('الصق مفتاح Gemini أولاً واضغط حفظ');const ms=localStorage.gm?[localStorage.gm]:MODELS;let err='';
+ for(const md of ms){const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${md}:generateContent`,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':k},body:JSON.stringify({contents:[{parts}],generationConfig:{responseMimeType:'application/json'}})});
+  const j=await r.json().catch(()=>({}));
+  if(r.ok){try{return JSON.parse(j.candidates[0].content.parts[0].text)}catch(e){throw Error('رد غير مفهوم من Gemini، أعد المحاولة')}}
+  err=j.error?.message||('HTTP '+r.status);if(r.status!==404)break}
+ throw Error('Gemini: '+err)}
+async function up(f){if(!CFG.cloud.name)throw Error('أكمل إعدادات Cloudinary في config.js');let w=f;
+ try{w=await shrink(f,1600,'image/webp',.82)||f}catch(e){if(f.size>10e6)throw Error('صورة كبيرة وغير مدعومة، حوّلها إلى JPG')}
+ const fd=new FormData();fd.append('file',w);fd.append('upload_preset',CFG.cloud.preset);
+ const r=await fetch(`https://api.cloudinary.com/v1_1/${CFG.cloud.name}/image/upload`,{method:'POST',body:fd});
+ if(!r.ok){const j=await r.json().catch(()=>({}));throw Error('Cloudinary: '+(j.error?.message||r.status))}return(await r.json()).secure_url}
+
+const lab={poster:'الملصق',album:'ألبوم',skip:'مستبعدة'};
+function grid(){$('#grid').innerHTML=imgs.map((x,i)=>`<div class="th ${x.s}" data-i="${i}"><img src="${x.u}" alt=""><span>${i+1} · ${lab[x.s]}</span></div>`).join('')}
+$('#grid').onclick=e=>{const t=e.target.closest('.th');if(!t)return;const x=imgs[+t.dataset.i];
+ if(x.s==='skip')x.s='album';else if(x.s==='album'){imgs.forEach(y=>{if(y.s==='poster')y.s='album'});x.s='poster'}else x.s='skip';grid()};
+$('#files').onchange=e=>{imgs=[...e.target.files].map((f,i)=>({f,u:URL.createObjectURL(f),s:i===0?'poster':'album'}));grid()};
+$('#gs').onclick=()=>{if($('#gk').value.trim()){localStorage.gk=$('#gk').value.trim();$('#gk').value='';toast('تم حفظ المفتاح')}};
+
+const today=()=>new Date().toLocaleDateString('en-CA',{timeZone:'Africa/Algiers',weekday:'long',year:'numeric',month:'2-digit',day:'2-digit'});
+$('#an').onclick=async()=>{
+ if(!imgs.length)return alert('اختر صور الفعالية أولاً');
+ const notes=$('#notes').value.trim();toast('جارٍ التحليل، قد يستغرق دقيقة...');$('#an').disabled=true;
+ try{
+  const P=`You help the admin of AGRESA, a student science and agriculture club at HSAM (Higher School of Agricultural Sciences, Mostaganem, Algeria), founded 2017. Tone: warm, positive, proud; never compare with other clubs. Use ONLY facts from the admin notes or clearly readable text in the photos. Never invent dates, names, places or partners; leave a field empty if unknown. Keep AGRESA, HSAM and personal names in Latin letters in every language. If a photographer credit is visible on the photos, put it in "credit".\nToday in Algeria is ${today()}.\nAdmin notes: ${notes||'(none)'}\nThere are ${imgs.length} photos, numbered 1 to ${imgs.length} in the order given. Choose the best "poster" (most representative and well composed). Give the "album" order of the remaining photos. In "skip" list exact duplicates, very blurry or unflattering photos, and close-up candid portraits of people who are not club members.\nReturn JSON exactly: {"title":{"ar":"","en":"","fr":""},"desc":{"ar":"","en":"","fr":""},"date":"YYYY-MM-DD or empty","place":"","credit":"","poster":1,"album":[],"skip":[]}`;
+  const parts=[{text:P}];
+  for(const [i,x] of imgs.entries()){try{const b=await shrink(x.f,768,'image/jpeg',.7);parts.push({text:'Photo '+(i+1)+':'},{inline_data:{mime_type:'image/jpeg',data:await b64(b)}})}catch(e){parts.push({text:'Photo '+(i+1)+': (could not be read)'})}}
+  const r=await gem(parts),n=imgs.length,ok=a=>(a||[]).map(Number).filter(i=>i>=1&&i<=n).map(i=>i-1);
+  const skip=new Set(ok(r.skip)),order=[...new Set(ok(r.album))],p=ok([r.poster])[0];
+  imgs.forEach((_,i)=>{if(!order.includes(i))order.push(i)});
+  imgs=order.map(i=>({...imgs[i],s:skip.has(i)?'skip':(i===p?'poster':'album')}));
+  if(!imgs.some(x=>x.s==='poster')){const f=imgs.find(x=>x.s!=='skip');if(f)f.s='poster'}
+  $('#t_ar').value=r.title?.ar||'';$('#t_en').value=r.title?.en||'';$('#t_fr').value=r.title?.fr||'';
+  $('#d_ar').value=r.desc?.ar||'';$('#d_en').value=r.desc?.en||'';$('#d_fr').value=r.desc?.fr||'';
+  $('#dt').value=/^\d{4}-\d\d-\d\d$/.test(r.date||'')?r.date:'';$('#pl').value=r.place||'';$('#cr').value=r.credit?'تصوير / Photos : '+String(r.credit).replace(/^(photos?|تصوير)\s*[:：]?\s*/i,''):'';
+  $('#rev').hidden=false;grid();$('#rev').scrollIntoView({behavior:'smooth'});toast('راجع النتيجة وعدّلها ثم احفظ');
+ }catch(x){alert(x.message)}finally{$('#an').disabled=false}};
+
+$('#pb').onclick=async()=>{
+ const t={ar:$('#t_ar').value.trim(),en:$('#t_en').value.trim(),fr:$('#t_fr').value.trim()},dt=$('#dt').value;
+ if(!t.ar)return alert('اكتب العنوان بالعربية');if(!dt)return alert('حدد التاريخ');
+ const use=imgs.filter(x=>x.s!=='skip');if(!use.length)return alert('اترك صورة واحدة على الأقل غير مستبعدة');
+ const po=use.find(x=>x.s==='poster')||use[0];
+ const desc=[$('#d_ar').value.trim(),$('#d_en').value.trim(),$('#d_fr').value.trim(),$('#cr').value.trim()].filter(Boolean).join('\n');
+ const ev={title:t,start:dt+'T00:00:00+01:00',end:dt+'T23:59:00+01:00',allDay:true,place:$('#pl').value.trim(),desc,pub:$('#pub').checked,status:'auto',created:Date.now()};
+ $('#pb').disabled=true;toast('جارٍ رفع الصور، انتظر ولا تغلق الصفحة...');
+ try{ev.poster=await up(po.f);ev.album=[];for(const x of use)if(x!==po)ev.album.push(await up(x.f));
+  await F.setDoc(F.doc(db,'events','e'+Date.now().toString(36)),ev);
+  toast(ev.pub?'نُشرت الفعالية':'حُفظت مسودة في تبويب الفعاليات');imgs=[];grid();$('#rev').hidden=true;$('#notes').value='';$('#files').value='';
+ }catch(x){alert('تعذر الحفظ: '+x.message)}finally{$('#pb').disabled=false}};
+
+A.onAuthStateChanged(auth,u=>{$('#auth').hidden=!!u;$('#app').hidden=!u});
+$('#in').onclick=()=>A.signInWithPopup(auth,new A.GoogleAuthProvider()).catch(e=>toast('تعذر الدخول: '+e.message));
+</script></body></html>

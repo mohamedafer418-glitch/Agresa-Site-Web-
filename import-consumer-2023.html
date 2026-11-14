@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>استيراد فعالية</title>
+<style>body{font:17px/1.8 Tahoma,sans-serif;background:#f3f0dd;color:#06210f;margin:0;padding:18px}main{max-width:560px;margin:auto}button{font:inherit;font-weight:700;min-height:52px;padding:0 22px;border:0;border-radius:12px;background:#1fb05a;color:#fff;width:100%;cursor:pointer}.card{background:#fffdf0;border:1px solid #0a3d2233;border-radius:16px;padding:16px}#msg{font-weight:700;word-break:break-word}</style></head>
+<body><main><div class="card"><h2>استيراد فعالية يوم حقوق المستهلك 2023</h2>
+<p>سجّل الدخول بحساب الأدمن ثم اضغط الزر مرة واحدة فقط. تُضاف الفعالية بصورها إلى الموقع.</p>
+<button id="go">الدخول بـ Google واستيراد الفعالية</button><p id="msg"></p></div></main>
+<script type="module">
+import {CFG} from './config.js';
+const msg=document.getElementById('msg');
+const V='https://www.gstatic.com/firebasejs/10.14.1/';
+const {initializeApp}=await import(V+'firebase-app.js'),A=await import(V+'firebase-auth.js'),F=await import(V+'firebase-firestore.js');
+const app=initializeApp(CFG.firebase),auth=A.getAuth(app),db=F.getFirestore(app);
+const EV={title:{ar:'يوم تحسيسي: حقوق المستهلك',en:'Awareness Day: Consumer Rights',fr:'Journée de sensibilisation : Les droits des consommateurs'},
+start:'2023-03-19T00:00:00+01:00',end:'2023-03-19T23:59:00+01:00',allDay:true,place:'المدرسة العليا للعلوم الفلاحية مستغانم · HSAM',
+desc:'فعالية توعوية وعلمية نظّمها نادي أڨريسا بمناسبة اليوم العالمي للمستهلك. تمحورت حول نشر الوعي الاستهلاكي، ومناقشة مواضيع الاستهلاك الأخلاقي والمسؤولية المجتمعية وكيفية حماية حقوق المستهلك، وسط حضور ومشاركة واسعة من الطلبة والمهتمين.\nAn awareness and scientific event organized by AGRESA for World Consumer Day. It focused on spreading consumer awareness and discussing ethical consumption, social responsibility and how to protect consumer rights, with wide attendance and participation from students and interested people.\nUn événement scientifique et de sensibilisation organisé par AGRESA à l’occasion de la Journée mondiale du consommateur, axé sur la sensibilisation des consommateurs, la consommation éthique, la responsabilité sociétale et la protection des droits du consommateur, avec une large participation d’étudiants et de personnes intéressées.\nتصوير / Photos : Med Rihane Photography',
+poster:'cr-poster.webp',album:['cr1','cr2','cr3','cr4','cr5','cr6','cr7'].map(x=>x+'.webp'),pub:true,status:'auto',created:Date.now()};
+document.getElementById('go').onclick=async()=>{
+ try{await A.signInWithPopup(auth,new A.GoogleAuthProvider());
+  await F.setDoc(F.doc(db,'events','consumer2023'),EV);
+  msg.textContent='تم الاستيراد. افتح لوحة الإدارة وراجع الفعالية.'}
+ catch(e){msg.textContent='تعذر الاستيراد: '+e.message}};
+</script></body></html>
