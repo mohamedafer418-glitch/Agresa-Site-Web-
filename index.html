@@ -168,7 +168,7 @@ function page(k){
  if(k==='story')body=`<div class="tl">${tx.tl.map(r=>`<div><b>${r[0]}</b><h3>${r[1]}</h3><p>${r[2]}</p></div>`).join('')}</div>`;
  else if(k==='join')body=SITE.joinOpen?`<h2>${tx.jt}</h2>${msgForm('joins')}`:`<div class="empty">${JC[lang]}</div><div style="margin-top:16px">${socCards()}</div>`;
  else if(k==='contact')body=`<h3>${FOL[lang][0]}</h3><p class="sub">${FOL[lang][1]}</p>${socCards()}<div class="card" style="text-align:center;max-width:260px;margin:18px auto"><img src="qr.png" alt="QR" loading="lazy" style="width:100%;border-radius:10px"><p class="sub" style="margin:8px 0 0">${QRT[lang]}</p></div><p class="sub" style="margin-top:14px">${tx.school}</p>${msgForm('messages')}${fbForm()}${fbList()}`;
- else if(k==='founders')body=peoplePage(['founder']);else if(k==='members')body=peoplePage(['member','board']);else if(k==='news')body=newsList();else if(k==='events')body=evPage();else if(k==='gallery')body=galPage();else body=list(SITE[k]||[]);
+ else if(k==='founders')body=peoplePage(['founder']);else if(k==='members')body=peoplePage(['star','board','member']);else if(k==='news')body=newsList();else if(k==='events')body=evPage();else if(k==='gallery')body=galPage();else body=list(SITE[k]||[]);
  const head=k==='join'?'':`<h2>${k==='contact'?tx.ct:ti}</h2><p class="sub">${k==='contact'?'':su}</p>`;
  return `<section><div class="wrap">${head}${body}</div></section>`;
 }
@@ -221,10 +221,11 @@ const PRES=[
  {n:'Guettat Ishak',r:['الرئيس الثالث','Third president','Troisième président'],y:'2023 – 2025',i:'p3'},
  {n:'Cherif Ali',r:['الرئيس الرابع','Fourth president','Quatrième président'],y:'2025',i:'p4'},
  {n:'Kamel Soltani',r:['الرئيس الخامس (الحالي)','Fifth and current president','Cinquième président (actuel)'],y:'2025 – ⟶',i:'p5'}];
+const GRK={founder:0,star:1,board:2,member:3};
 function peoplePage(gs){const now={ar:'الآن',en:'present',fr:'aujourd’hui'}[lang];
- let l=SITE.people.filter(p=>gs.includes(p.group)).sort((a,b)=>(+a.order||0)-(+b.order||0));
+ let l=SITE.people.filter(p=>gs.includes(p.group)).sort((a,b)=>(GRK[a.group]??9)-(GRK[b.group]??9)||(+a.order||0)-(+b.order||0));
  if(!l.length&&gs.includes('founder')&&!SITE.people.length)l=PRES.map(p=>({title:{ar:p.n,en:p.n,fr:p.n},role:{ar:p.r[0],en:p.r[1],fr:p.r[2]},years:p.y,img:''+p.i+'.webp'}));
- return l.length?`<div class="grid">${l.map(p=>{const nm=p.title?.[lang]||p.title?.ar||'',rl=p.role?.[lang]||p.role?.ar||'';return `<div class="card">${ed('people',p.id)}${p.img?`<img src="${esc(p.img)}" alt="${esc(nm||rl)}" loading="lazy" style="width:100%;height:auto;border-radius:12px;margin-bottom:10px">`:''}${p.years?`<span class="tag">${esc(p.years).replace('⟶',now)}</span>`:''}<h3>${esc(nm||rl)}</h3>${nm?`<p class="sub" style="margin:0">${esc(rl)}</p>`:''}</div>`}).join('')}</div>`:`<div class="empty">${t().empty}</div>`}
+ return l.length?`<div class="grid">${l.map(p=>{const nm=p.title?.[lang]||p.title?.ar||p.title?.en||'',rl=p.role?.[lang]||p.role?.ar||'',bd=p.badge?.[lang]||p.badge?.ar||'';return `<div class="card"${(bd||p.group==='star')?' style="border:2px solid #e6c36a"':''}>${ed('people',p.id)}${p.img?`<img src="${esc(p.img)}" alt="${esc(nm||rl)}" loading="lazy" style="width:100%;height:auto;border-radius:12px;margin-bottom:10px">`:''}${p.years?`<span class="tag">${esc(p.years).replace('⟶',now)}</span>`:''}${bd?`<span class="tag" style="background:#e6c36a;margin-inline-start:6px">🏅 ${esc(bd)}</span>`:''}<h3>${esc(nm||rl)}</h3>${nm&&rl?`<p class="sub" style="margin:0">${esc(rl)}</p>`:''}</div>`}).join('')}</div>`:`<div class="empty">${t().empty}</div>`}
 function fixUrl(k,v){v=String(v).trim();if(/^https?:\/\//i.test(v))return v;if(/\./.test(v))return 'https://'+v.replace(/^\/+/,'');return {instagram:'https://www.instagram.com/',tiktok:'https://www.tiktok.com/@',facebook:'https://www.facebook.com/'}[k]+v.replace(/^@/,'')}
 function applySet(d){SITE.joinOpen=!!d.joinOpen;if(d.cover)SITE.cover=d.cover;if(d.email)SITE.email=d.email;for(const k in d.social||{})if(d.social[k])SITE.social[k]=fixUrl(k,d.social[k]);
  for(const l of ['ar','en','fr']){for(const k of ['h','p','school','foot'])if(d.tx?.[k]?.[l])T[l][k]=d.tx[k][l];

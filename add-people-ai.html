@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>إضافة الأعضاء بالذكاء</title>
+<style>
+[hidden]{display:none!important}*{box-sizing:border-box}body{margin:0;font:16px/1.7 Cairo,Tahoma,sans-serif;background:#f3f0dd;color:#06210f}
+header{background:#0a3d22;color:#f3f0dd;padding:12px 16px;display:flex;gap:12px;align-items:center}header b{flex:1}header a{color:#7be3a1}
+main{max-width:820px;margin:auto;padding:16px}.card{background:#fffdf0;border:1px solid #0a3d2230;border-radius:16px;padding:14px;margin-bottom:12px}
+button{font:inherit;font-weight:700;min-height:46px;padding:0 18px;border:0;border-radius:12px;background:#1fb05a;color:#fff;cursor:pointer}button.o{background:transparent;color:#0a3d22;border:1.5px solid #0a3d22}button.s{min-height:36px;font-size:14px}
+input,textarea,select{font:inherit;width:100%;min-height:44px;padding:8px 12px;border-radius:12px;border:1.5px solid #0a3d2255;background:#fff;margin-bottom:8px}label{display:block;font-weight:700;margin-bottom:3px}
+label.c{display:flex;gap:10px;align-items:center}label.c input{width:22px;min-height:22px;margin:0}
+.p{display:flex;gap:10px;border:1px solid #0a3d2230;border-radius:14px;padding:10px;margin-bottom:10px;background:#fff}.p .pi{width:84px;height:104px;object-fit:cover;border-radius:10px;flex:none}.pf{flex:1;min-width:0}
+summary{cursor:pointer;margin-bottom:8px}#toast{position:fixed;bottom:14px;inset-inline:14px;background:#06210f;color:#fff;padding:14px;border-radius:12px;text-align:center;display:none;z-index:9}
+</style></head><body>
+<header><b>إضافة الأعضاء بالذكاء</b><a href="admin.html">لوحة الإدارة</a></header>
+<main>
+<div class="card" id="auth" hidden><p>سجّل الدخول بحساب الأدمن.</p><button id="in">الدخول بـ Google</button></div>
+<div id="app" hidden>
+ <div class="card"><label>اكتب الأعضاء، كل واحد في سطر</label>
+ <textarea id="lines" rows="8" placeholder="Michiche mohamed nadhir مؤسس الموقع&#10;آمين سنوسي grh&#10;وسام: اسم العضو | صفته"></textarea>
+ <p style="margin:0 0 10px;font-size:14px">اكتب الاسم ثم صفته أو وسامه بأي صياغة. ويفهم Gemini الاختصارات مثل GRH. إن كانت صورك بطاقات عليها الأسماء، أو ملفاتك مسمّاة بأسماء الأعضاء، فسيطابقها بنفسه.</p>
+ <label>صور الأعضاء (يمكنك اختيار عشرات الصور معاً)</label><input type="file" id="files" accept="image/*" multiple>
+ <button id="an">حلّل بـ Gemini</button></div>
+ <div class="card"><label>مفتاح Gemini (يُحفظ في هذا المتصفح فقط)</label><input id="gk" type="password" dir="ltr" placeholder="مشترك مع لوحة الإدارة إن حفظته هناك"><button class="o s" id="gs">حفظ المفتاح</button></div>
+ <div id="rev" hidden><h3>راجع وعدّل قبل الحفظ (<span id="cnt"></span>)</h3><p id="note" style="margin-top:0"></p><div id="list"></div>
+  <div class="card"><label class="c"><input type="checkbox" id="pub">انشرهم الآن في الموقع (أنا أتحمل موافقتهم)</label><p style="margin:0 0 10px;font-size:14px">إن لم تعلّمها تُحفظ مخفية، وتفعّلها لاحقاً من تبويب «الأشخاص».</p><button id="sv">ارفع الصور واحفظ الأعضاء</button></div></div>
+</div>
+</main><div id="toast"></div>
+<script type="module">
+import {CFG} from './config.js';
+const $=s=>document.querySelector(s);
+const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const toast=t=>{const e=$('#toast');e.textContent=t;e.style.display='block';setTimeout(()=>e.style.display='none',3500)};
+const V='https://www.gstatic.com/firebasejs/10.14.1/';
+const {initializeApp}=await import(V+'firebase-app.js'),A=await import(V+'firebase-auth.js'),F=await import(V+'firebase-firestore.js');
+const app=initializeApp(CFG.firebase),auth=A.getAuth(app),db=F.getFirestore(app);
+const MODELS=['gemini-3.1-flash-lite','gemini-3.5-flash','gemini-3-flash-preview'];
+let imgs=[],P=[];
+const dec=async f=>{try{return await createImageBitmap(f)}catch(e){const i=new Image();i.src=URL.createObjectURL(f);await i.decode();return i}};
+async function shrink(f,px,type,q){const b=await dec(f),W=b.width||b.naturalWidth,H=b.height||b.naturalHeight,s=Math.min(1,px/Math.max(W,H)),c=document.createElement('canvas');c.width=W*s|0;c.height=H*s|0;c.getContext('2d').drawImage(b,0,0,c.width,c.height);return new Promise(r=>c.toBlob(r,type,q))}
+const b64=b=>new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result.split(',')[1]);x.readAsDataURL(b)});
+async function gem(parts){const k=localStorage.gk;if(!k)throw Error('الصق مفتاح Gemini أولاً واضغط حفظ');const ms=localStorage.gm?[localStorage.gm]:MODELS;let err='';
+ for(const md of ms){const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${md}:generateContent`,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':k},body:JSON.stringify({contents:[{parts}],generationConfig:{responseMimeType:'application/json'}})});
+  const j=await r.json().catch(()=>({}));
+  if(r.ok){try{return JSON.parse(j.candidates[0].content.parts[0].text)}catch(e){throw Error('رد غير مفهوم من Gemini، أعد المحاولة')}}
+  err=j.error?.message||('HTTP '+r.status);if(r.status!==404)break}
+ throw Error('Gemini: '+err)}
+async function up(f){if(!CFG.cloud.name)throw Error('أكمل إعدادات Cloudinary في config.js');let w=f;
+ try{w=await shrink(f,1200,'image/webp',.82)||f}catch(e){if(f.size>10e6)throw Error('صورة كبيرة وغير مدعومة، حوّلها إلى JPG')}
+ const fd=new FormData();fd.append('file',w);fd.append('upload_preset',CFG.cloud.preset);
+ const r=await fetch(`https://api.cloudinary.com/v1_1/${CFG.cloud.name}/image/upload`,{method:'POST',body:fd});
+ if(!r.ok){const j=await r.json().catch(()=>({}));throw Error('Cloudinary: '+(j.error?.message||r.status))}return(await r.json()).secure_url}
+
+const GR=[['member','عضو'],['star','عضو مميز'],['board','الهيئة الإدارية'],['founder','مؤسس أو رئيس']];
+const blank=()=>({ar:'',lat:'',roleAr:'',roleEn:'',roleFr:'',bdAr:'',bdEn:'',bdFr:'',group:'member',photo:-1});
+function draw(){
+ $('#list').innerHTML=P.map((p,i)=>`<div class="p" data-i="${i}"><img class="pi" src="${p.photo>=0?imgs[p.photo].u:''}" alt="" ${p.photo>=0?'':'hidden'}><div class="pf">
+ <input data-k="ar" value="${esc(p.ar)}" placeholder="الاسم بالعربية"><input data-k="lat" dir="ltr" value="${esc(p.lat)}" placeholder="Name (Latin)">
+ <input data-k="roleAr" value="${esc(p.roleAr)}" placeholder="الصفة بالعربية"><input data-k="bdAr" value="${esc(p.bdAr)}" placeholder="الوسام بالعربية (اختياري)">
+ <select data-k="group">${GR.map(([v,l])=>`<option value="${v}" ${p.group===v?'selected':''}>${l}</option>`).join('')}</select>
+ <select data-k="photo"><option value="-1">بلا صورة</option>${imgs.map((x,j)=>`<option value="${j}" ${p.photo===j?'selected':''}>صورة ${j+1} · ${esc(x.name)}</option>`).join('')}</select>
+ <details><summary>الترجمات</summary><input data-k="roleEn" dir="ltr" value="${esc(p.roleEn)}" placeholder="Role (EN)"><input data-k="roleFr" dir="ltr" value="${esc(p.roleFr)}" placeholder="Rôle (FR)"><input data-k="bdEn" dir="ltr" value="${esc(p.bdEn)}" placeholder="Badge (EN)"><input data-k="bdFr" dir="ltr" value="${esc(p.bdFr)}" placeholder="Badge (FR)"></details>
+ <button class="o s" data-del="${i}">حذف هذا الشخص</button></div></div>`).join('')||'<p>لا نتائج.</p>';
+ $('#cnt').textContent=P.length+' شخصاً';
+}
+$('#list').oninput=$('#list').onchange=e=>{const t=e.target,row=t.closest('.p');if(!row||!t.dataset.k)return;const p=P[+row.dataset.i];
+ if(t.dataset.k==='photo'){p.photo=+t.value;const im=row.querySelector('.pi');im.hidden=p.photo<0;im.src=p.photo>=0?imgs[p.photo].u:''}else p[t.dataset.k]=t.value};
+$('#list').onclick=e=>{const d=e.target.dataset.del;if(d!==undefined&&confirm('حذف هذا الصف؟')){P.splice(+d,1);draw()}};
+$('#files').onchange=e=>{imgs=[...e.target.files].map(f=>({f,u:URL.createObjectURL(f),name:f.name}))};
+$('#gs').onclick=()=>{if($('#gk').value.trim()){localStorage.gk=$('#gk').value.trim();$('#gk').value='';toast('تم حفظ المفتاح')}};
+
+const RULES="Names: keep each person's name exactly as the admin wrote it; never transliterate, translate or correct names. Put the Arabic-script spelling in \"ar\" when the name is written in Arabic, and the Latin spelling in \"lat\" when written in Latin; if only one script is given copy it to the other field. Never invent names, roles or badges.";
+$('#an').onclick=async()=>{
+ const text=$('#lines').value.trim();if(!text&&!imgs.length)return alert('اكتب الأعضاء أو اختر صوراً');
+ $('#an').disabled=true;P=[];let loose=imgs.length;
+ try{
+  if(text){toast('جارٍ فهم النص...');
+   const r=await gem([{text:`You help the admin of AGRESA (a student science and agriculture club at HSAM, Algeria) add members to the club website. Each member is written with a name and sometimes a club position ("role") or an honorary distinction ("badge", e.g. "مؤسس الموقع" / website founder, or anything after the word وسام or badge). Examples of the admin's style: "Michiche mohamed nadhir مؤسس الموقع", "آمين سنوسي grh".\n${RULES}\nDecide for each descriptor: club position -> "role"; honorary distinction -> "badge". Expand abbreviations (GRH = مسؤول الموارد البشرية / HR Manager / Responsable RH) and give role and badge in ar, en and fr. If unsure, put it in "role". Group: "board" for management-board positions (president, vice president, secretary, treasurer, HR, communication, etc.), "star" for anyone with a badge, "founder" for club founders or past presidents, otherwise "member".\nText:\n${text}\nReturn JSON exactly: {"people":[{"ar":"","lat":"","role":{"ar":"","en":"","fr":""},"badge":{"ar":"","en":"","fr":""},"group":"member"}]}`}]);
+   P=(r.people||[]).map(x=>({...blank(),ar:x.ar||'',lat:x.lat||'',roleAr:x.role?.ar||'',roleEn:x.role?.en||'',roleFr:x.role?.fr||'',bdAr:x.badge?.ar||'',bdEn:x.badge?.en||'',bdFr:x.badge?.fr||'',group:GR.some(g=>g[0]===x.group)?x.group:'member'}))}
+  if(imgs.length){const used=new Set(),CH=10;
+   for(let s=0;s<imgs.length;s+=CH){toast(`جارٍ مطابقة الصور ${Math.min(s+CH,imgs.length)}/${imgs.length}...`);
+    const parts=[{text:`These are photos for AGRESA club members. Known people (index: name): ${P.length?P.map((p,i)=>i+': '+(p.ar||'')+' / '+(p.lat||'')).join('; '):'(none, read names from the photos)'}\nEach photo is listed with its number and file name. Decide which known person each photo belongs to: use a name printed on the photo (cards) first, then the file name. Never decide from faces. If a photo shows a readable person's name that is not in the known list, report it in "extra" with the name exactly as printed. If you cannot match a photo, leave it out.\nReturn JSON exactly: {"match":[{"photo":1,"person":0}],"extra":[{"photo":2,"name":"","role":""}]}`}];
+    for(let i=s;i<Math.min(s+CH,imgs.length);i++){try{const b=await shrink(imgs[i].f,640,'image/jpeg',.6);parts.push({text:`Photo ${i+1} (file: ${imgs[i].name}):`},{inline_data:{mime_type:'image/jpeg',data:await b64(b)}})}catch(e){parts.push({text:`Photo ${i+1} (file: ${imgs[i].name}): could not be read`})}}
+    const r=await gem(parts);
+    for(const m of r.match||[]){const j=+m.photo-1,k=+m.person;if(j>=0&&j<imgs.length&&P[k]&&P[k].photo<0&&!used.has(j)){P[k].photo=j;used.add(j)}}
+    for(const x of r.extra||[]){const j=+x.photo-1;if(j>=0&&j<imgs.length&&!used.has(j)&&x.name){P.push({...blank(),ar:x.name,lat:x.name,roleAr:x.role||'',photo:j});used.add(j)}}}
+   loose=imgs.length-used.size}
+  $('#note').textContent=imgs.length?`${loose} صورة بلا مطابقة، يمكنك إسنادها يدوياً من قائمة «الصورة» في كل صف.`:'';
+  $('#rev').hidden=false;draw();$('#rev').scrollIntoView({behavior:'smooth'});toast('راجع النتيجة وعدّلها ثم احفظ');
+ }catch(x){alert(x.message)}finally{$('#an').disabled=false}};
+
+const nm=s=>String(s||'').toLowerCase().replace(/\s+/g,' ').trim();
+$('#sv').onclick=async()=>{
+ const rows=P.filter(p=>(p.ar||p.lat).trim());if(!rows.length)return alert('لا يوجد أحد للحفظ');
+ $('#sv').disabled=true;
+ try{
+  const snap=await F.getDocs(F.collection(db,'people')),have=new Set();let mx=0;
+  snap.forEach(d=>{const x=d.data();mx=Math.max(mx,+x.order||0);[x.title?.ar,x.title?.en].forEach(v=>v&&have.add(nm(v)))});
+  const todo=rows.filter(p=>![p.ar,p.lat].some(v=>v&&have.has(nm(v)))),skipped=rows.length-todo.length;
+  if(!todo.length)return alert('كل هؤلاء موجودون مسبقاً في الموقع');
+  const need=[...new Set(todo.filter(p=>p.photo>=0).map(p=>p.photo))],url={};let n=0;
+  for(const i of need){n++;toast(`رفع الصور ${n}/${need.length}، انتظر...`);url[i]=await up(imgs[i].f)}
+  const pub=$('#pub').checked;let k=mx;
+  for(let s=0;s<todo.length;s+=400){const b=F.writeBatch(db);
+   todo.slice(s,s+400).forEach((p,j)=>{const t=p.ar||p.lat,l=p.lat||p.ar;
+    b.set(F.doc(db,'people','p'+Date.now().toString(36)+(s+j)),{title:{ar:t,en:l,fr:l},role:{ar:p.roleAr,en:p.roleEn,fr:p.roleFr},badge:{ar:p.bdAr,en:p.bdEn,fr:p.bdFr},years:'',img:p.photo>=0?url[p.photo]:'',group:p.group,order:String(++k),pub,created:Date.now()})});
+   await b.commit()}
+  toast(`تم حفظ ${todo.length} شخصاً`+(skipped?` وتخطّي ${skipped} موجودين مسبقاً`:''));P=[];imgs=[];$('#rev').hidden=true;$('#lines').value='';$('#files').value='';
+ }catch(x){alert('تعذر الحفظ: '+x.message)}finally{$('#sv').disabled=false}};
+
+A.onAuthStateChanged(auth,u=>{$('#auth').hidden=!!u;$('#app').hidden=!u});
+$('#in').onclick=()=>A.signInWithPopup(auth,new A.GoogleAuthProvider()).catch(e=>toast('تعذر الدخول: '+e.message));
+</script></body></html>
