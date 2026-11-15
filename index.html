@@ -65,6 +65,14 @@ footer .soc{justify-content:center;margin:14px 0}footer .soc a,footer .soc span{
 @media(prefers-reduced-motion:no-preference){.hero .badge-big{animation:rise 1.2s ease both}@keyframes rise{from{opacity:0;transform:translateY(18px)}}}
 .badge-big{width:150px;height:150px;border-radius:50%;background:#f3f0dd;display:grid;place-items:center;margin-bottom:18px}.badge-big img{width:124px}
 .card{position:relative}.ed{position:absolute;top:8px;inset-inline-end:8px;display:flex;gap:4px;z-index:2}.ed button,.tb button{min-width:38px;height:38px;border-radius:10px;border:0;background:var(--gold);color:#06210f;font:700 14px Cairo;cursor:pointer;padding:0 10px}.tb{display:flex;gap:8px;flex-wrap:wrap;padding:10px 18px;background:var(--bg2)}
+.lk{background:transparent;border:1.5px solid var(--line);color:inherit;border-radius:99px;padding:4px 14px;font:700 15px Cairo;cursor:pointer;min-height:38px;margin-top:8px}.lk.on{border-color:#e0556b;color:#e0556b}
+[hidden]{display:none!important}
+#cb{position:fixed;inset-block-end:16px;inset-inline-end:16px;width:58px;height:58px;border-radius:50%;border:0;background:var(--gold);color:#06210f;font-size:26px;cursor:pointer;z-index:40;box-shadow:0 6px 18px #0006}
+#cp{position:fixed;inset-block-end:86px;inset-inline-end:12px;width:min(380px,calc(100vw - 24px));height:min(520px,70vh);background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:18px;display:flex;flex-direction:column;z-index:41;overflow:hidden;box-shadow:0 10px 30px #0007}
+#cp .ch{background:var(--g1);color:#f3f0dd;padding:10px 14px;display:flex;justify-content:space-between;align-items:center}#cp .ch button{background:transparent;border:0;color:inherit;font-size:18px;cursor:pointer}
+#cm{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.mb{padding:8px 12px;border-radius:14px;max-width:88%;font-size:15px;line-height:1.6;white-space:pre-wrap}.mu{align-self:flex-start;background:var(--gold);color:#06210f}.ma{align-self:flex-end;background:var(--bg2)}
+#cf{display:flex;gap:6px;padding:8px;border-top:1px solid var(--line)}#cf input{flex:1;margin:0}#cf button{min-width:48px;border:0;border-radius:12px;background:var(--g2);color:#fff;font-size:18px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -74,6 +82,7 @@ footer .soc{justify-content:center;margin:14px 0}footer .soc a,footer .soc span{
  <div class="tools" id="tools"></div>
 </header>
 <main id="app" tabindex="-1"></main>
+<button id="cb" hidden aria-label="chat">💬</button><div id="cp" hidden><div class="ch"><b id="ct"></b><button id="cx" aria-label="close">✕</button></div><div id="cm"></div><form id="cf"><input id="ci" autocomplete="off" maxlength="400"><button aria-label="send">➤</button></form></div>
 <footer><div class="wrap"><b class="lat">AGRESA</b><div id="fname"></div><div class="soc" id="fsoc"></div><small id="fnote"></small></div></footer>
 
 <script>
@@ -84,7 +93,7 @@ const SITE={
  nextEvent:{demo:true,start:'2026-11-15T09:00:00+01:00',end:'2026-11-15T14:00:00+01:00',
   title:{ar:'فعالية تجريبية: سيحدد المدير الموعد الحقيقي',en:'Demo event: the admin will set the real date',fr:'Événement démo : l’admin fixera la vraie date'},
   place:{ar:'HSAM مستغانم',en:'HSAM Mostaganem',fr:'HSAM Mostaganem'}},
- news:[],fb:[],people:[],events:[],founders:[],members:[],works:[],gallery:[],honor:[]
+ news:[],fb:[],people:[],likes:{},chatUrl:'',events:[],founders:[],members:[],works:[],gallery:[],honor:[]
 };
 const T={
  ar:{nav:['الرئيسية','قصتنا','الفعاليات','المؤسسون','الأعضاء','الأعمال','المعرض','الأخبار','انضم','تواصل'],
@@ -139,7 +148,7 @@ function chrome(){
  const h=location.hash.replace('#/','');
  $('#nav').innerHTML=ROUTES.map((r,i)=>(['works','gallery'].includes(r)||(r==='join'&&!SITE.joinOpen))?'':`<a href="#/${r}" class="${h===r?'on':''}">${t().nav[i]}</a>`).join('');
  $('#tools').innerHTML=['ar','en','fr'].map(l=>`<button class="${l===lang?'on':''}" data-l="${l}" aria-label="${l}">${l==='ar'?'ع':l.toUpperCase()}</button>`).join('')+`<button id="th" aria-label="theme">${theme==='dark'?'☀':'☾'}</button>`;
- $('#fname').textContent=t().school;$('#fsoc').innerHTML=soc();$('#fnote').textContent=t().foot+' · #We_are_green';
+ $('#fname').textContent=t().school;$('#fsoc').innerHTML=soc();$('#fnote').textContent=t().foot+' · #We_are_green';chatLang();
  document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr';document.documentElement.dataset.t=theme;
 }
 function countdown(){
@@ -158,6 +167,7 @@ function home(){
  <section><div class="wrap"><div class="ev"><h2>${tx.next}</h2>${e?`<p>${esc(tt(e))}${e.demo?` <span class="tag">${tx.demo}</span>`:''}</p><p class="sub" style="margin:4px auto">${when(e)} · ${esc(pl(e))}</p>`:''}${e&&e.poster?`<img src="${esc(e.poster)}" alt="${esc(tt(e))}" style="width:100%;max-width:420px;border-radius:16px;margin:10px 0" loading="lazy">`:''}<div id="cd"></div>
  ${e?`<a class="btn" href="#/events">${tx.reg}</a><a class="btn alt" href="#/events">${tx.cal}</a>`:''}</div></div></section>
  ${recent()}
+ ${gameSec()}
  <section><div class="wrap"><h2>${tx.news}</h2>${newsList(3)}${SITE.news.length>3?`<p><a class="btn alt" style="color:inherit" href="#/news">${ALL[lang]}</a></p>`:''}</div></section>
  <section><div class="wrap stats"><div><b>${yrs}</b>${tx.stats[0]}</div><div><b>∞</b>${tx.stats[1]}</div><div><b>${SITE.members.length}</b>${tx.stats[2]}</div></div></section>
  <section><div class="wrap"><h2>${FOL[lang][0]}</h2><p class="sub">${FOL[lang][1]}</p><div class="soc">${soc()}</div><img src="hashtag.jpg" alt="#We_are_green" loading="lazy" style="width:100%;max-width:360px;border-radius:18px;margin-top:18px"></div></section>`;
@@ -167,7 +177,7 @@ function page(k){
  const tx=t(),[ti,su]=tx.pages[k]||['',''];let body;
  if(k==='story')body=`<div class="tl">${tx.tl.map(r=>`<div><b>${r[0]}</b><h3>${r[1]}</h3><p>${r[2]}</p></div>`).join('')}</div>`;
  else if(k==='join')body=SITE.joinOpen?`<h2>${tx.jt}</h2>${msgForm('joins')}`:`<div class="empty">${JC[lang]}</div><div style="margin-top:16px">${socCards()}</div>`;
- else if(k==='contact')body=`<h3>${FOL[lang][0]}</h3><p class="sub">${FOL[lang][1]}</p>${socCards()}<div class="card" style="text-align:center;max-width:260px;margin:18px auto"><img src="qr.png" alt="QR" loading="lazy" style="width:100%;border-radius:10px"><p class="sub" style="margin:8px 0 0">${QRT[lang]}</p></div><p class="sub" style="margin-top:14px">${tx.school}</p>${msgForm('messages')}${fbForm()}${fbList()}`;
+ else if(k==='contact')body=`<h3>${FOL[lang][0]}</h3><p class="sub">${FOL[lang][1]}</p>${socCards()}<div class="card" style="text-align:center;max-width:260px;margin:18px auto"><img src="qr.png" alt="QR" loading="lazy" style="width:100%;border-radius:10px"><p class="sub" style="margin:8px 0 0">${QRT[lang]}</p></div>${gameCard()}<p class="sub" style="margin-top:14px">${tx.school}</p>${msgForm('messages')}${fbForm()}${fbList()}`;
  else if(k==='founders')body=peoplePage(['founder']);else if(k==='members')body=peoplePage(['star','board','member']);else if(k==='news')body=newsList();else if(k==='events')body=evPage();else if(k==='gallery')body=galPage();else body=list(SITE[k]||[]);
  const head=k==='join'?'':`<h2>${k==='contact'?tx.ct:ti}</h2><p class="sub">${k==='contact'?'':su}</p>`;
  return `<section><div class="wrap">${head}${body}</div></section>`;
@@ -181,18 +191,18 @@ function nextEv(){const l=SITE.events.filter(e=>vis(e)&&['upcoming','live'].incl
 const tt=e=>e.title[lang]||e.title.ar||'',pl=e=>typeof e.place==='string'?e.place:(e.place?.[lang]||'');
 const fz=d=>new Date(d).toISOString().replace(/[-:]|\.\d+/g,'');
 function evCard(e){const s=st(e),tx=t(),on=s==='upcoming'||s==='live';
- return `<div class="card">${ed('events',e.id)}${e.poster?`<img src="${esc(e.poster)}" alt="${esc(tt(e))}" loading="lazy" style="width:100%;border-radius:12px;margin-bottom:10px">`:''}<span class="tag">${ST[lang][s]}</span><h3>${esc(tt(e))}</h3><p class="sub" style="margin:0">${e.dateText?esc(dtx(e.dateText)):when(e)}</p><p>${esc(pl(e))}${e.map?` <a href="${esc(e.map)}" target="_blank" rel="noopener">🗺</a>`:''}</p>${e.note?`<p><b>${esc(e.note)}</b></p>`:''}${e.desc?`<p>${esc(e.desc).replace(/\n/g,'<br>')}</p>`:''}${e.seats?`<p class="sub">${esc(e.seats)} ✦</p>`:''}${on&&e.reg?`<a class="btn" href="${esc(e.reg)}" target="_blank" rel="noopener">${tx.reg}</a> `:''}${s==='upcoming'?`<button class="btn alt" data-ics="${esc(e.id)}">${tx.cal} .ics</button> <a class="btn alt" target="_blank" rel="noopener" href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(tt(e))}&dates=${fz(e.start)}/${fz(e.end)}&location=${encodeURIComponent(pl(e))}">Google</a>`:''}${(e.album||[]).length?`<div class="grid" style="margin-top:10px;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px">${e.album.map(a=>`<img data-z="${esc(a)}" src="${esc(a)}" alt="" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;cursor:zoom-in">`).join('')}</div>`:''}</div>`}
+ return `<div class="card">${ed('events',e.id)}${e.poster?`<img src="${esc(e.poster)}" alt="${esc(tt(e))}" loading="lazy" style="width:100%;border-radius:12px;margin-bottom:10px">`:''}<span class="tag">${ST[lang][s]}</span><h3>${esc(tt(e))}</h3><p class="sub" style="margin:0">${e.dateText?esc(dtx(e.dateText)):when(e)}</p><p>${esc(pl(e))}${e.map?` <a href="${esc(e.map)}" target="_blank" rel="noopener">🗺</a>`:''}</p>${e.note?`<p><b>${esc(e.note)}</b></p>`:''}${e.desc?`<p>${esc(e.desc).replace(/\n/g,'<br>')}</p>`:''}${e.seats?`<p class="sub">${esc(e.seats)} ✦</p>`:''}${on&&e.reg?`<a class="btn" href="${esc(e.reg)}" target="_blank" rel="noopener">${tx.reg}</a> `:''}${s==='upcoming'?`<button class="btn alt" data-ics="${esc(e.id)}">${tx.cal} .ics</button> <a class="btn alt" target="_blank" rel="noopener" href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(tt(e))}&dates=${fz(e.start)}/${fz(e.end)}&location=${encodeURIComponent(pl(e))}">Google</a>`:''}${heart('ev_'+e.id)}${(e.album||[]).length?`<div class="grid" style="margin-top:10px;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px">${e.album.map(a=>`<img data-z="${esc(a)}" src="${esc(a)}" alt="" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;cursor:zoom-in">`).join('')}</div>`:''}</div>`}
 function evPage(){const l=SITE.events.filter(vis),up=l.filter(e=>st(e)!=='ended').sort((a,b)=>new Date(a.start)-new Date(b.start)),old=l.filter(e=>st(e)==='ended').sort((a,b)=>new Date(b.start)-new Date(a.start));
  return l.length?`<div class="grid">${up.concat(old).map(evCard).join('')}</div>`:`<div class="empty">${t().empty}</div>`}
 function galPage(){return SITE.gallery.length?`<div class="grid">${SITE.gallery.map(g=>`<figure class="card" style="padding:8px"><a href="${esc(g.img)}" target="_blank"><img src="${esc(g.img)}" alt="${esc(g.cap||'')}" loading="lazy" style="width:100%;border-radius:10px"></a>${g.cap?`<figcaption class="sub" style="margin:6px 0 0">${esc(g.cap)}</figcaption>`:''}</figure>`).join('')}</div>`:`<div class="empty">${t().empty}</div>`}
 function icsDl(id){const e=SITE.events.find(x=>x.id===id);if(!e)return;const c=x=>String(x).replace(/[,;\n]/g,' ');
  const b=new Blob([['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//AGRESA//AR','BEGIN:VEVENT','UID:'+e.id+'@agresa','DTSTAMP:'+fz(Date.now()),'DTSTART:'+fz(e.start),'DTEND:'+fz(e.end),'SUMMARY:'+c(e.title.ar||tt(e)),'LOCATION:'+c(pl(e)),'END:VEVENT','END:VCALENDAR'].join('\r\n')],{type:'text/calendar'});
  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='agresa-event.ics';a.click()}
-async function load(){try{const {CFG}=await import('./config.js');if(!CFG.firebase.apiKey)return;
+async function load(){try{const {CFG}=await import('./config.js');SITE.chatUrl=CFG.chatUrl||'';if(!CFG.firebase.apiKey)return;
  const V='https://www.gstatic.com/firebasejs/10.14.1/',[{initializeApp},F]=await Promise.all([import(V+'firebase-app.js'),import(V+'firebase-firestore.js')]),db=F.getFirestore(initializeApp(CFG.firebase));window.FB={db,F};
  const g=async(n,f)=>(await F.getDocs(F.query(F.collection(db,n),F.where(f,'==',true)))).docs.map(d=>({id:d.id,...d.data()}));
  const [ev,po,fb]=await Promise.all([g('events','pub'),g('posts','pub'),g('feedback','ok')]);
- SITE.events=ev;SITE.news=po.filter(vis).sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(b.created||0)-(a.created||0));SITE.fb=fb;SITE.people=await g('people','pub').catch(()=>[]);try{const sd=await F.getDoc(F.doc(db,'settings','site'));if(sd.exists())applySet(sd.data())}catch(e){console.warn(e)}}catch(e){console.warn(e)}}
+ SITE.events=ev;SITE.news=po.filter(vis).sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(b.created||0)-(a.created||0));SITE.fb=fb;try{SITE.likes={};(await F.getDocs(F.collection(db,'likes'))).forEach(d=>SITE.likes[d.id]=d.data().n||0)}catch(e){}SITE.people=await g('people','pub').catch(()=>[]);try{const sd=await F.getDoc(F.doc(db,'settings','site'));if(sd.exists())applySet(sd.data())}catch(e){console.warn(e)}}catch(e){console.warn(e)}}
 const EDIT=new URLSearchParams(location.search).has('edit')&&parent!==window;
 const ed=(c,id)=>EDIT&&id?`<span class="ed"><button data-ed="${c}:${id}" aria-label="edit">✎</button><button data-del="${c}:${id}" aria-label="delete">🗑</button></span>`:'';
 const SENT={ar:'وصلتنا رسالتك، شكراً لك',en:'Received, thank you',fr:'Bien reçu, merci'};
@@ -200,13 +210,42 @@ async function sendForm(ev,c){ev.preventDefault();const f=ev.target,d=Object.fro
  if(!window.FB){alert('Not connected yet');return}
  if(d.rate)d.rate=+d.rate;
  try{await FB.F.addDoc(FB.F.collection(FB.db,c),{...d,read:false,at:FB.F.serverTimestamp(),...(c==='feedback'?{ok:false}:{})});f.reset();f.insertAdjacentHTML('beforeend',`<p class="tag">${SENT[lang]}</p>`)}catch(e){alert('Error')}}
-function newsCard(x){return `<div class="card">${ed('posts',x.id)}${x.img?`<img src="${esc(x.img)}" alt="" loading="lazy" style="width:100%;border-radius:12px;margin-bottom:10px">`:''}${(x.album||[]).length?`<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-bottom:10px">${x.album.map(a=>`<img data-z="${esc(a)}" src="${esc(a)}" alt="" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;cursor:zoom-in">`).join('')}</div>`:''}${x.pinned?`<span class="tag">📌</span> `:''}<h3>${esc(x.title?.[lang]||x.title?.ar)}</h3><p>${esc(x.body?.[lang]||x.body?.ar).replace(/\n/g,'<br>')}</p></div>`}
+function newsCard(x){return `<div class="card">${ed('posts',x.id)}${x.img?`<img src="${esc(x.img)}" alt="" loading="lazy" style="width:100%;border-radius:12px;margin-bottom:10px">`:''}${(x.album||[]).length?`<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-bottom:10px">${x.album.map(a=>`<img data-z="${esc(a)}" src="${esc(a)}" alt="" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;cursor:zoom-in">`).join('')}</div>`:''}${x.pinned?`<span class="tag">📌</span> `:''}<h3>${esc(x.title?.[lang]||x.title?.ar)}</h3><p>${esc(x.body?.[lang]||x.body?.ar).replace(/\n/g,'<br>')}</p>${heart('po_'+x.id)}</div>`}
 const EM={ar:'البريد الإلكتروني',en:'Email',fr:'E-mail'};
 const QRT={ar:'امسح الرمز بكاميرا هاتفك',en:'Scan the code with your phone camera',fr:'Scannez le code avec votre téléphone'};
 const RC={ar:'من محطاتنا',en:'Highlights',fr:'Moments forts'};
 function recent(){const l=SITE.events.filter(e=>vis(e)&&st(e)==='ended').sort((a,b)=>new Date(b.start)-new Date(a.start));return l[0]?`<section><div class="wrap"><h2>${RC[lang]}</h2><div class="grid">${evCard(l[0])}</div></div></section>`:''}
 const JC={ar:'باب الانضمام مغلق حالياً. نفتحه مرة في العام، فتابع حساباتنا ليصلك الإعلان أولاً.',en:'Membership is closed for now. We open it once a year, so follow our accounts to hear the announcement first.',fr:'Les adhésions sont fermées pour le moment. Nous les ouvrons une fois par an, suivez nos comptes pour être informé en premier.'};
 const dtx=s=>{const a=String(s).split('|');return a[{ar:0,en:1,fr:2}[lang]]||a[0]};
+const LK=()=>{try{return JSON.parse(localStorage.lk||'{}')}catch(e){return{}}};
+const heart=id=>window.FB&&id?`<button class="lk${LK()[id]?' on':''}" data-lk="${esc(id)}" aria-label="like">${LK()[id]?'♥':'♡'} <b>${(SITE.likes||{})[id]||0}</b></button>`:'';
+async function toggleLike(b){const id=b.dataset.lk,m=LK(),on=!m[id],d=on?1:-1;if(on)m[id]=1;else delete m[id];localStorage.lk=JSON.stringify(m);
+ SITE.likes=SITE.likes||{};const n=Math.max(0,(SITE.likes[id]||0)+d);SITE.likes[id]=n;b.classList.toggle('on',on);b.innerHTML=(on?'♥':'♡')+' <b>'+n+'</b>';
+ try{const {db,F}=window.FB,ref=F.doc(db,'likes',id);await F.runTransaction(db,async t=>{const s=await t.get(ref),c=s.exists()?(s.data().n||0):0,v=Math.max(0,c+d);s.exists()?t.update(ref,{n:v}):t.set(ref,{n:Math.max(1,v)})})}catch(e){console.warn(e)}}
+const GURL='https://qrfy.io/ng7_iBMdAt';
+const GAME={ar:['العب لعبة أڨريسا','امسح الرمز بكاميرا هاتفك للعب','من إنتاج'],en:['Play the AGRESA game','Scan the code with your phone camera to play','Created by'],fr:['Jouez au jeu AGRESA','Scannez le code avec votre téléphone pour jouer','Créé par']};
+function gameCard(){const g=GAME[lang];return `<div class="card" style="text-align:center;max-width:300px;margin:18px auto"><h3>${g[0]}</h3><a href="${GURL}" target="_blank" rel="noopener noreferrer"><img src="game-qr.png" alt="QR" loading="lazy" style="width:100%;border-radius:10px"></a><p class="sub" style="margin:8px 0 0">${g[1]}</p><p class="sub" style="margin:2px 0 0;font-size:14px">${g[2]} <b dir="ltr">Michiche Mohamed Nadhir</b></p></div>`}
+const gameSec=()=>`<section><div class="wrap">${gameCard()}</div></section>`;
+const CH={ar:{t:'اسأل عن أڨريسا',ph:'اكتب سؤالك عن النادي...',hi:'مرحباً! أنا مساعد أڨريسا. اسألني عن النادي وفعالياته وأعضائه وكيفية التواصل معنا.',err:'تعذر الرد الآن، حاول لاحقاً.'},en:{t:'Ask about AGRESA',ph:'Ask about the club...',hi:'Hello! I am the AGRESA assistant. Ask me about the club, its events, members and how to reach us.',err:'Cannot answer right now, please try later.'},fr:{t:'Questions sur AGRESA',ph:'Posez votre question sur le club...',hi:'Bonjour ! Je suis l’assistant d’AGRESA. Interrogez-moi sur le club, ses événements, ses membres et comment nous contacter.',err:'Impossible de répondre pour le moment, réessayez plus tard.'}};
+let chatH=[];
+function chatCtx(){const o=[];
+ o.push('Club: AGRESA, student science and agriculture club at HSAM (Higher School of Agricultural Sciences, Mostaganem, Algeria), founded 2017. Hashtag: #We_are_green.');
+ o.push('Story (Arabic): '+T.ar.tl.map(r=>r.join(' - ')).join(' | '));o.push('Story (English): '+T.en.tl.map(r=>r.join(' - ')).join(' | '));
+ o.push('Contact: email '+SITE.email+'; Instagram '+SITE.social.instagram+'; TikTok '+SITE.social.tiktok+'; Facebook '+SITE.social.facebook);
+ o.push('Membership: '+(SITE.joinOpen?'open now, see the Join page of the site':'closed now; opens once a year, follow the club accounts for the announcement'));
+ o.push('Game: the AGRESA game (QR code on the site), created by Michiche Mohamed Nadhir: '+GURL);
+ o.push('Events:\n'+SITE.events.filter(vis).map(e=>`- ${e.title?.ar||''} / ${e.title?.en||''} | date: ${e.dateText||String(e.start||'').slice(0,10)} | status: ${st(e)} | place: ${e.place||''} | ${String(e.desc||'').slice(0,300)}`).join('\n'));
+ o.push('People:\n'+SITE.people.map(p=>`- ${p.title?.ar||''} / ${p.title?.en||''} | ${p.role?.en||p.role?.ar||''} | ${p.badge?.en||p.badge?.ar||''} | ${p.years||''}`).slice(0,80).join('\n'));
+ o.push('News:\n'+SITE.news.map(x=>`- ${x.title?.ar||''} / ${x.title?.en||''}: ${String(x.body?.ar||x.body?.en||'').slice(0,200)}`).slice(0,15).join('\n'));
+ return o.join('\n').slice(0,14000)}
+function addMsg(c,t){const d=document.createElement('div');d.className='mb '+(c==='u'?'mu':'ma');d.textContent=t;$('#cm').append(d);$('#cm').scrollTop=1e6;return d}
+async function chatSend(q){const h=chatH.slice(-6);addMsg('u',q);const w=addMsg('a','…');chatH.push({r:'user',t:q});
+ try{const r=await fetch(SITE.chatUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({q,history:h,context:chatCtx(),lang})}),j=await r.json();if(!r.ok||!j.answer)throw 0;w.textContent=j.answer;chatH.push({r:'model',t:j.answer})}catch(e){w.textContent=CH[lang].err}}
+function chatInit(){if(!SITE.chatUrl||EDIT)return;$('#cb').hidden=false;chatLang();
+ $('#cb').onclick=()=>{const p=$('#cp');p.hidden=!p.hidden;if(!p.hidden&&!$('#cm').children.length)addMsg('a',CH[lang].hi)};
+ $('#cx').onclick=()=>{$('#cp').hidden=true};
+ $('#cf').onsubmit=e=>{e.preventDefault();const q=$('#ci').value.trim();if(!q)return;$('#ci').value='';chatSend(q)}}
+function chatLang(){if($('#ct'))$('#ct').textContent=CH[lang].t;if($('#ci'))$('#ci').placeholder=CH[lang].ph}
 const ALL={ar:'كل الأخبار',en:'All news',fr:'Toutes les actualités'};
 const FOL={ar:['تابعنا','لتصلك أخبارنا وفعالياتنا أولاً بأول، تابع حساباتنا وكن جزءاً من العائلة الخضراء.'],en:['Follow us','Follow our accounts to get our news and events first, and be part of the green family.'],fr:['Suivez-nous','Suivez nos comptes pour recevoir nos actualités et événements en premier et rejoindre la famille verte.']};
 const newsList=n=>SITE.news.length?`<div class="grid">${SITE.news.slice(0,n||99).map(newsCard).join('')}</div>`:`<div class="empty">${t().nonews}</div>`;
@@ -238,10 +277,11 @@ function render(){
 }
 document.addEventListener('click',e=>{const z=e.target.closest('img[data-z]');if(z){document.body.insertAdjacentHTML('beforeend',`<div id="lb" onclick="this.remove()" style="position:fixed;inset:0;background:#000d;z-index:99;display:grid;place-items:center;padding:12px;cursor:zoom-out"><img src="${z.dataset.z}" alt="" style="max-width:100%;max-height:100%;border-radius:10px"></div>`);return}
  const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.lk){toggleLike(b);return}
  if(b.dataset.l){lang=b.dataset.l;localStorage.lang=lang;render()}
  if(EDIT){const d=b.dataset;if(d.ed||d.del||d.add||d.set){const v=d.ed||d.del||d.add||'';parent.postMessage({a:d.ed?'edit':d.del?'del':d.add?'add':'set',c:v.split(':')[0],id:v.split(':')[1]},location.origin);return}}
  if(b.dataset.ics)icsDl(b.dataset.ics);if(b.id==='th'){theme=theme==='dark'?'light':'dark';localStorage.theme=theme;chrome()}});
-addEventListener('hashchange',render);load().then(render);
+addEventListener('hashchange',render);load().then(()=>{render();chatInit()});
 </script>
 </body>
 </html>
