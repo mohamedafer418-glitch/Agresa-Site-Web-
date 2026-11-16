@@ -9,12 +9,5 @@ export const CFG = {
     name: 'fzla3xja',
     preset: 'agresa_preset'
   },
-  chatUrl: 'https://agresa-chatbot.mohamedafer418.workers.dev'
+  chatUrl: 'https://agresa-chat.pages.dev'
 };
-
-// Keep-alive: يبقي اتصال الـ Worker نشطاً ويمنع انتهاء صلاحية DNS
-setInterval(() => {
-  fetch(CFG.chatUrl, { method: 'GET' })
-    .then(() => {})
-    .catch(() => {});
-}, 180000); // كل 3 دقائق
