@@ -1,3 +1,4 @@
+// Firebase / Cloudinary settings (not secrets) and the chatbot addresses.
 export const CFG = {
   firebase: {
     apiKey: 'AIzaSyCfyrUlEeQVMMYhQffn6Bf6wamMjgMWGzk',
@@ -9,5 +10,6 @@ export const CFG = {
     name: 'fzla3xja',
     preset: 'agresa_preset'
   },
-  chatUrl: 'https://agresa-chat.pages.dev'
+  chatUrl: 'https://agresa-chatbot.mohamedafer418.workers.dev',
+  chatUrl2: 'https://agresa-chat.pages.dev'
 };
