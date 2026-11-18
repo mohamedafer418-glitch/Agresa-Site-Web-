@@ -216,7 +216,7 @@ function galPage(){return SITE.gallery.length?`<div class="grid">${SITE.gallery.
 function icsDl(id){const e=SITE.events.find(x=>x.id===id);if(!e)return;const c=x=>String(x).replace(/[,;\n]/g,' ');
  const b=new Blob([['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//AGRESA//AR','BEGIN:VEVENT','UID:'+e.id+'@agresa','DTSTAMP:'+fz(Date.now()),'DTSTART:'+fz(e.start),'DTEND:'+fz(e.end),'SUMMARY:'+c(e.title.ar||tt(e)),'LOCATION:'+c(pl(e)),'END:VEVENT','END:VCALENDAR'].join('\r\n')],{type:'text/calendar'});
  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='agresa-event.ics';a.click()}
-async function load(){try{const {CFG}=await import('./config.js');SITE.chatUrls=[CFG.chatUrl,CFG.chatUrl2].filter(Boolean);SITE.chatUrl=SITE.chatUrls[0]||'';if(!CFG.firebase.apiKey)return;
+async function load(){try{const {CFG}=await import('./config.js');SITE.chatUrls=[CFG.chatUrl,CFG.chatUrl2,CFG.chatUrl3].filter(Boolean);SITE.chatUrl=SITE.chatUrls[0]||'';if(!CFG.firebase.apiKey)return;
  const V='https://www.gstatic.com/firebasejs/10.14.1/',[{initializeApp},F]=await Promise.all([import(V+'firebase-app.js'),import(V+'firebase-firestore.js')]),db=F.getFirestore(initializeApp(CFG.firebase));window.FB={db,F};
  const g=async(n,f)=>(await F.getDocs(F.query(F.collection(db,n),F.where(f,'==',true)))).docs.map(d=>({id:d.id,...d.data()}));
  const [ev,po,fb]=await Promise.all([g('events','pub'),g('posts','pub'),g('feedback','ok')]);
@@ -258,17 +258,19 @@ function chatCtx(){const o=[];
  o.push('News:\n'+SITE.news.map(x=>`- ${x.title?.ar||''} / ${x.title?.en||''}: ${String(x.body?.ar||x.body?.en||'').slice(0,200)}`).slice(0,15).join('\n'));
  return o.join('\n').slice(0,14000)}
 function addMsg(c,t){const d=document.createElement('div');d.className='mb '+(c==='u'?'mu':'ma');d.textContent=t;$('#cm').append(d);$('#cm').scrollTop=1e6;return d}
+function askAny(urls,body){
+ const good=localStorage.cu,list=urls.slice().sort((a,b)=>(a===good?-1:0)-(b===good?-1:0));
+ return new Promise(resolve=>{let done=false,left=list.length,code='';const acs=[];
+  const fin=(ans,c,u)=>{if(done)return;if(ans){done=true;acs.forEach(a=>a.abort());try{localStorage.cu=u}catch(e){}resolve({ans});return}
+   code=c||code;if(--left<=0){done=true;resolve({code})}};
+  list.forEach((u,i)=>setTimeout(async()=>{if(done)return;const ac=new AbortController();acs.push(ac);const to=setTimeout(()=>ac.abort(),30000);
+   try{const r=await fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body,signal:ac.signal}),j=await r.json().catch(()=>({}));clearTimeout(to);
+    if(r.ok&&j.answer)fin(j.answer,'',u);else fin(null,j.code||r.status,u)}
+   catch(e){clearTimeout(to);fin(null,e&&e.name==='AbortError'?'timeout':'net',u)}},i*(window.CHAT_STAGGER??4000)))})}
 async function chatSend(q){const h=chatH.slice(-6);addMsg('u',q);const w=addMsg('a','…');$('#cb').classList.add('busy');chatH.push({r:'user',t:q});
- let code='',ans='';const body=JSON.stringify({q,history:h,context:chatCtx(),lang});
- for(const u of (SITE.chatUrls&&SITE.chatUrls.length?SITE.chatUrls:[SITE.chatUrl])){
-  const ac=new AbortController(),to=setTimeout(()=>ac.abort(),25000);
-  try{const r=await fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body,signal:ac.signal}),j=await r.json().catch(()=>({}));
-   if(r.ok&&j.answer){ans=j.answer;clearTimeout(to);break}
-   code=j.code||r.status;if(code==='rate'){clearTimeout(to);break}}
-  catch(e){code=e&&e.name==='AbortError'?'timeout':'net'}
-  clearTimeout(to)}
- w.textContent=ans||(code==='rate'?CH[lang].rate:CH[lang].err+(code?' ('+code+')':''));
- if(ans)chatH.push({r:'model',t:ans});
+ const r=await askAny(SITE.chatUrls&&SITE.chatUrls.length?SITE.chatUrls:[SITE.chatUrl],JSON.stringify({q,history:h,context:chatCtx(),lang}));
+ w.textContent=r.ans||(r.code==='rate'?CH[lang].rate:CH[lang].err+(r.code?' ('+r.code+')':''));
+ if(r.ans)chatH.push({r:'model',t:r.ans});
  $('#cb').classList.remove('busy');$('#cb').classList.add('happy');setTimeout(()=>$('#cb').classList.remove('happy'),1800)}
 const ROBOT='<svg viewBox="0 0 64 64" aria-hidden="true"><g class="hd"><circle class="ant" cx="32" cy="7" r="3.2" fill="#e0556b"/><rect x="31" y="9" width="2" height="8" rx="1" fill="#0a3d22"/><rect x="7" y="28" width="5" height="11" rx="2.5" fill="#0a3d22"/><rect x="52" y="28" width="5" height="11" rx="2.5" fill="#0a3d22"/><rect x="11" y="16" width="42" height="36" rx="13" fill="#0a3d22"/><rect x="15" y="21" width="34" height="26" rx="9" fill="#06210f"/><g class="eyes"><g class="el"><ellipse class="bl" cx="25" cy="31" rx="3.6" ry="4.6" fill="#7be3a1"/></g><g class="er"><ellipse class="bl" cx="39" cy="31" rx="3.6" ry="4.6" fill="#7be3a1"/></g></g><circle class="ck" cx="20" cy="38.5" r="2.6" fill="#ff8aa1"/><circle class="ck" cx="44" cy="38.5" r="2.6" fill="#ff8aa1"/><path class="ms" d="M25 39 Q32 45 39 39" fill="none" stroke="#7be3a1" stroke-width="2.4" stroke-linecap="round"/><g class="ml"><path d="M24 38 Q32 52 40 38 Z" fill="#7be3a1"/><ellipse cx="32" cy="44.5" rx="3.2" ry="1.7" fill="#e0556b"/></g></g></svg>';
 const NUDGE={ar:'اسألني عن أڨريسا 👋',en:'Ask me about AGRESA 👋',fr:'Demandez-moi sur AGRESA 👋'};

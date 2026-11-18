@@ -1,4 +1,5 @@
 // Firebase / Cloudinary settings (not secrets) and the chatbot addresses.
+// The site tries these addresses in turn and remembers the one that works on each phone.
 export const CFG = {
   firebase: {
     apiKey: 'AIzaSyCfyrUlEeQVMMYhQffn6Bf6wamMjgMWGzk',
@@ -11,5 +12,6 @@ export const CFG = {
     preset: 'agresa_preset'
   },
   chatUrl: 'https://agresa-chatbot.mohamedafer418.workers.dev',
-  chatUrl2: 'https://agresa-chat.pages.dev'
+  chatUrl2: 'https://agresa-chat.pages.dev',
+  chatUrl3: ''   // after deploying on Vercel put e.g. 'https://agresa-chat.vercel.app/api/chat'
 };
