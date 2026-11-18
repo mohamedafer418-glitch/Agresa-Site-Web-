@@ -13,5 +13,5 @@ export const CFG = {
   },
   chatUrl: 'https://agresa-chatbot.mohamedafer418.workers.dev',
   chatUrl2: 'https://agresa-chat.pages.dev',
-  chatUrl3: ''   // after deploying on Vercel put e.g. 'https://agresa-chat.vercel.app/api/chat'
+  chatUrl3: 'https://agresa-site-aeb-f9qh.vercel.app/api/chat'
 };
