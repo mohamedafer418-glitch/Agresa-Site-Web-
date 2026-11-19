@@ -11,7 +11,9 @@ export const CFG = {
     name: 'fzla3xja',
     preset: 'agresa_preset'
   },
-  chatUrl: 'https://agresa-chatbot.mohamedafer418.workers.dev',
-  chatUrl2: 'https://agresa-chat.pages.dev',
-  chatUrl3: 'https://agresa-site-aeb-f9qh.vercel.app/api/chat'
+  // 1) Vercel: put YOUR full domain here, copied from the address bar, then /api/chat
+  chatUrl: 'https://agresa-site-web.vercel.app/api/chat',
+  // 2) Cloudflare Worker
+  chatUrl2: 'https://agresa-chatbot.mohamedafer418.workers.dev',
+  chatUrl3: ''
 };
