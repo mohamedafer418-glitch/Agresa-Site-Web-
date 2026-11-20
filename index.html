@@ -193,7 +193,7 @@ function home(){
 function list(a,msg){return a.length?`<div class="grid">${a.map(x=>`<div class="card"><h3>${x.title?.[lang]||''}</h3></div>`).join('')}</div>`:`<div class="empty">${msg||t().empty}</div>`}
 function page(k){
  const tx=t(),[ti,su]=tx.pages[k]||['',''];let body;
- if(k==='story')body=`<div class="tl">${tx.tl.map(r=>`<div><b>${r[0]}</b><h3>${r[1]}</h3><p>${r[2]}</p></div>`).join('')}</div>${mileHtml()}`;
+ if(k==='story')body=`<div class="tl">${tx.tl.map(r=>`<div><b>${r[0]}</b><h3>${r[1]}</h3><p>${r[2]}</p></div>`).join('')}</div>`;
  else if(k==='join')body=SITE.joinOpen?`<h2>${tx.jt}</h2>${msgForm('joins')}`:`<div class="empty">${JC[lang]}</div><div style="margin-top:16px">${socCards()}</div>`;
  else if(k==='contact')body=`<h3>${FOL[lang][0]}</h3><p class="sub">${FOL[lang][1]}</p>${socCards()}<div class="card" style="text-align:center;max-width:260px;margin:18px auto"><img src="qr.png" alt="QR" loading="lazy" style="width:100%;border-radius:10px"><p class="sub" style="margin:8px 0 0">${QRT[lang]}</p></div>${gameCard()}<p class="sub" style="margin-top:14px">${tx.school}</p>${msgForm('messages')}${fbForm()}${fbList()}`;
  else if(k==='founders')body=peoplePage(['founder']);else if(k==='members')body=peoplePage(['star','board','member']);else if(k==='news')body=newsList();else if(k==='events')body=evPage();else if(k==='gallery')body=galPage();else body=list(SITE[k]||[]);
@@ -282,17 +282,6 @@ function chatInit(){if(!SITE.chatUrl||EDIT)return;$('#cb').hidden=false;$('#cb')
  $('#cx').onclick=()=>{$('#cp').hidden=true};
  $('#cf').onsubmit=e=>{e.preventDefault();const q=$('#ci').value.trim();if(!q)return;$('#ci').value='';chatSend(q)}}
 function chatLang(){if($('#ct'))$('#ct').textContent=CH[lang].t;if($('#ci'))$('#ci').placeholder=CH[lang].ph}
-const MILE={
- ar:{h:'محطات موثقة',src:'مستخلصة من تدقيق تاريخي لمصادر مؤسساتية وصحفية، نوفمبر 2026.',d:'أقسام النادي',
-  m:[['2017','تأسيس طلابي لنادي أڨريسا داخل المدرسة العليا للفلاحة بمستغانم.'],['10 جويلية 2019','مقرر تأسيس النادي رقم 405، كما يرد في دليل النوادي العلمية لوزارة التعليم العالي والبحث العلمي.'],['17 نوفمبر 2021','ندوة نقاش حول أزمة الدواجن، بالتنسيق بين المدرسة ونادي أڨريسا.'],['21 إلى 23 جوان 2022','الأيام الريادية INNOV، من تنظيم النادي.'],['14 ماي 2023','جناح إرشاد زراعي في عيد البطاطا، مع عرض عن ست خطوات لتحسين مردود البطاطا.']],
-  dp:['الإعلام والاتصال','تسيير الموارد البشرية (GRH)','العلاقات الخارجية والداخلية','النشاطات']},
- en:{h:'Documented milestones',src:'Drawn from a historical audit of institutional and press sources, November 2026.',d:'Club departments',
-  m:[['2017','AGRESA is founded by students of the Higher School of Agriculture in Mostaganem.'],['10 July 2019','Club founding decision no. 405, as listed in the Ministry of Higher Education scientific clubs guide.'],['17 November 2021','A debate workshop on the poultry crisis, coordinated between the school and AGRESA.'],['21 to 23 June 2022','The INNOV entrepreneurship days, organized by the club.'],['14 May 2023','An agricultural extension stand at the Potato Festival, with a talk on six steps to improve potato yield.']],
-  dp:['Media and Communication','Human Resources Management (GRH)','External and Internal Relations','Activities']},
- fr:{h:'Jalons documentés',src:'Tirés d’un audit historique de sources institutionnelles et de presse, novembre 2026.',d:'Départements du club',
-  m:[['2017','AGRESA est fondé par des étudiants de l’École supérieure d’agronomie de Mostaganem.'],['10 juillet 2019','Décision de création du club n° 405, telle que listée dans le guide des clubs scientifiques du ministère de l’Enseignement supérieur.'],['17 novembre 2021','Atelier débat sur la crise avicole, en coordination entre l’école et AGRESA.'],['21 au 23 juin 2022','Les journées entrepreneuriales INNOV, organisées par le club.'],['14 mai 2023','Stand de vulgarisation agricole à la Fête de la Pomme de Terre, avec un exposé sur six étapes pour améliorer le rendement.']],
-  dp:['Média et Communication','Gestion des Ressources Humaines (GRH)','Relations Externes et Internes','Activités']}};
-function mileHtml(){const g=MILE[lang];return `<h3 style="margin-top:34px">${g.h}</h3><p class="sub">${g.src}</p><div class="tl">${g.m.map(r=>`<div><b style="font-size:20px">${r[0]}</b><p>${r[1]}</p></div>`).join('')}</div><h3 style="margin-top:34px">${g.d}</h3><div class="soc">${g.dp.map(x=>`<span>${x}</span>`).join('')}</div>`}
 const ALL={ar:'كل الأخبار',en:'All news',fr:'Toutes les actualités'};
 const FOL={ar:['تابعنا','لتصلك أخبارنا وفعالياتنا أولاً بأول، تابع حساباتنا وكن جزءاً من العائلة الخضراء.'],en:['Follow us','Follow our accounts to get our news and events first, and be part of the green family.'],fr:['Suivez-nous','Suivez nos comptes pour recevoir nos actualités et événements en premier et rejoindre la famille verte.']};
 const newsList=n=>SITE.news.length?`<div class="grid">${SITE.news.slice(0,n||99).map(newsCard).join('')}</div>`:`<div class="empty">${t().nonews}</div>`;
